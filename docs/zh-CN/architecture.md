@@ -67,6 +67,8 @@ MCP 相关：
 - `internal/mcp/`：Server、外部 MCP、连接恢复。
 - `internal/einomcp/`：Eino 与 MCP 工具适配。
 - `tools/`：YAML 命令工具。
+- `internal/toolrunner/`：共享 YAML 参数映射，保证本地执行器和独立工具平面使用同一工具接口。
+- `internal/toolcatalog/`：工具平面适配器目录与 90 个仓库工具的迁移清单。
 - `internal/app/*_tools.go`：Go 内置工具注册。
 
 工具调用会进入监控记录，并可受 HITL 审批影响。

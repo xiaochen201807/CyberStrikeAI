@@ -45,6 +45,22 @@
 
 这样可以大幅减少token消耗，特别是当工具数量很多时（如100个工具）。
 
+## Docker 部署兼容性
+
+`tools/*.yaml` 是 CyberStrikeAI 当前工具注册表的事实来源。Docker 控制平面会加载完整目录，
+因此不能用一个只包含少数扫描器的镜像或 Compose 文件替换它。工具二进制是否已经迁移到独立
+工具平面，以 [`deploy/tools/inventory.yaml`](../deploy/tools/inventory.yaml) 为准：
+
+- `native`：保持原有控制平面执行契约；需要在受管运行时安装对应命令。
+- `external-adapter`：已经有独立工具平面适配器，并保留原 YAML 定义作为兼容注册。
+- `builtin`：由控制平面内部实现，不能作为普通外部命令迁移。
+
+`availability: enabled` 只表示定义启用；实际二进制状态看 `binary_status`。`unverified` 仍需在
+具体运行时中用 `command -v` 和最小安全参数完成验收。
+
+新增工具时先添加 YAML 定义，再运行 `toolcatalog inventory` 更新部署清单。没有镜像、参数
+适配器、目标边界和结果回写契约时，不要把工具标记为已容器化。
+
 ## 参数定义
 
 每个参数可以包含以下字段：

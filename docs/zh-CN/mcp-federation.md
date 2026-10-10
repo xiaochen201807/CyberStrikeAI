@@ -53,6 +53,22 @@ external_mcp:
 
 也可以通过 Web 的 MCP 管理页面新增、启动、停止和删除。
 
+对于 Docker 化安全工具，推荐使用仓库中的独立工具平面：
+
+```text
+deploy/tools/docker-compose.yml
+deploy/tools/catalog.yaml
+deploy/tools/inventory.yaml
+```
+
+`nuclei-mcp` 和 `zap-mcp` 分别构建在对应工具镜像上，只暴露 catalog 中固定的工具参数。
+它们加入控制平面内部网络，不发布宿主机端口；CyberStrikeAI 使用 SSE 地址和 `X-Tool-Token`
+连接。控制平面本身不挂载 Docker Socket。
+
+`inventory.yaml` 才是当前项目 90 个 `tools/*.yaml` 定义的完整清单；`catalog.yaml` 是已经具备
+隔离适配器的子集。需要迁移其他工具族时，使用 `tool-compat-mcp` 读取原 YAML，并为该工具族提供
+单独的运行时镜像；这样可以保留原工具接口，不需要把所有命令塞入一个大镜像。
+
 接口：
 
 - `GET /api/external-mcp`

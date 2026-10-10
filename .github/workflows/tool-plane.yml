@@ -1,0 +1,93 @@
+name: Tool plane contract
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "deploy/**"
+      - "cmd/tool-mcp/**"
+      - "cmd/toolcatalog/**"
+      - "internal/toolcatalog/**"
+      - "internal/toolrunner/**"
+      - "tools/**"
+      - ".github/workflows/tool-plane.yml"
+  pull_request:
+    paths:
+      - "deploy/**"
+      - "cmd/tool-mcp/**"
+      - "cmd/toolcatalog/**"
+      - "internal/toolcatalog/**"
+      - "internal/toolrunner/**"
+      - "tools/**"
+      - ".github/workflows/tool-plane.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Test catalog and MCP adapter
+        run: go test ./internal/toolcatalog ./internal/toolrunner ./cmd/toolcatalog ./cmd/tool-mcp
+      - name: Validate catalog and Compose contract
+        run: go run ./cmd/toolcatalog validate --require-digests --compose deploy/tools/docker-compose.yml deploy/tools/catalog.yaml
+      - name: Verify the full repository tool inventory is current
+        run: |
+          go run ./cmd/toolcatalog inventory --tools-dir tools --catalog deploy/tools/catalog.yaml --output /tmp/tool-inventory.yaml
+          diff -u deploy/tools/inventory.yaml /tmp/tool-inventory.yaml
+      - name: Validate effective tool images and secure defaults
+        run: REQUIRE_IMAGE_DIGESTS=1 ./deploy/tools/scripts/validate.sh
+      - name: Validate Compose files
+        run: |
+          docker compose -f deploy/control/docker-compose.yml config --quiet
+          docker compose -f deploy/tools/docker-compose.yml --env-file deploy/tools/.env.example config --quiet
+      - name: Check shell wrappers
+        run: sh -n deploy/control/entrypoint.sh deploy/tools/scripts/*.sh
+
+  # Build every image that is shipped by the independent Compose projects.
+  # This is an actual BuildKit build with push disabled: a green job means the
+  # Dockerfiles, pinned scanner bases, copied registry and Go bridge all layer
+  # successfully. Publishing is deliberately left to a release workflow.
+  build-images:
+    needs: validate
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: control
+            file: deploy/control/Dockerfile
+            tag: cyberstrike-ai-ci:control
+            base_image: debian:bookworm-slim
+          - name: tool-compat
+            file: deploy/tools/services/tool-mcp/Dockerfile
+            tag: cyberstrike-ai-ci:tool-compat
+            base_image: debian:bookworm-slim
+          - name: nuclei-mcp
+            file: deploy/tools/services/tool-mcp/Dockerfile
+            tag: cyberstrike-ai-ci:nuclei-mcp
+            base_image: projectdiscovery/nuclei:v3.4.10@sha256:aeb5ea2db32a252b8135707d2ad0e89b90e19a18ea7816d38759bc51efb46b97
+          - name: zap-mcp
+            file: deploy/tools/services/tool-mcp/Dockerfile
+            tag: cyberstrike-ai-ci:zap-mcp
+            base_image: ghcr.io/zaproxy/zaproxy:2.16.1@sha256:7840969c7c9fead565bf9734b12f49f6886db90b1d35b1f74d79710bbd081dab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build ${{ matrix.name }} image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.file }}
+          tags: ${{ matrix.tag }}
+          build-args: |
+            TOOL_BASE_IMAGE=${{ matrix.base_image }}
+          load: true
+          push: false
+          provenance: false
+          sbom: false
+          cache-from: type=gha,scope=cyberstrike-${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=cyberstrike-${{ matrix.name }}

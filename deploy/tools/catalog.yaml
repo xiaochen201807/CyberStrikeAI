@@ -1,0 +1,119 @@
+schema_version: 1
+name: cyberstrike-tool-plane
+# Full repository tool registry and migration status. This adapter catalog is
+# intentionally smaller: only entries with a runnable isolated adapter live
+# below; inventory.yaml must still contain every tools/*.yaml definition.
+inventory: inventory.yaml
+
+profiles:
+  baseline:
+    description: 低影响 Web 基线检查，适合首次验证和回归测试
+  web:
+    description: Web 漏洞扫描，必须使用项目目标白名单和人工审批
+  high-risk:
+    description: 高风险工具，默认不启动，需单独的隔离运行节点
+
+tools:
+  - id: zap_baseline
+    service: zap-mcp
+    kind: mcp
+    transport: sse
+    image: ghcr.io/zaproxy/zaproxy:2.16.1@sha256:7840969c7c9fead565bf9734b12f49f6886db90b1d35b1f74d79710bbd081dab
+    profile: baseline
+    compose_profile: baseline-mcp
+    risk: medium
+    approval: human
+    enabled: true
+    target:
+      input: single_url
+      allowlist_required: true
+      supports_multiple: false
+    limits:
+      timeout_seconds: 1800
+      concurrency: 1
+      max_targets: 1
+    output:
+      format: json
+      directory: /reports
+      report_pattern: zap-*.json
+    result_adapter: zap_json
+    endpoint: http://zap-mcp:8080/sse
+    description: 对一个已授权 URL 执行低影响 ZAP 基线检查。
+
+  - id: zap_baseline_job
+    service: zap-baseline
+    kind: job
+    transport: compose
+    image: ghcr.io/zaproxy/zaproxy:2.16.1@sha256:7840969c7c9fead565bf9734b12f49f6886db90b1d35b1f74d79710bbd081dab
+    profile: baseline
+    compose_profile: baseline-job
+    risk: medium
+    approval: human
+    enabled: true
+    target:
+      input: single_url
+      allowlist_required: true
+      supports_multiple: false
+    limits:
+      timeout_seconds: 1800
+      concurrency: 1
+      max_targets: 1
+    output:
+      format: json
+      directory: /reports
+      report_pattern: zap-*.json
+    result_adapter: zap_json
+    description: 以一次性 Compose 任务执行低影响 ZAP 基线检查。
+
+  - id: nuclei_scan
+    service: nuclei-mcp
+    kind: mcp
+    transport: sse
+    image: projectdiscovery/nuclei:v3.4.10@sha256:aeb5ea2db32a252b8135707d2ad0e89b90e19a18ea7816d38759bc51efb46b97
+    profile: web
+    compose_profile: web-mcp
+    risk: medium
+    approval: human
+    enabled: true
+    target:
+      input: single_url
+      allowlist_required: true
+      supports_multiple: false
+    limits:
+      timeout_seconds: 1800
+      rate: 30
+      concurrency: 10
+      max_targets: 1
+    output:
+      format: json
+      directory: /reports
+      report_pattern: nuclei-*.json
+    result_adapter: nuclei_json
+    endpoint: http://nuclei-mcp:8080/sse
+    description: 对一个已授权 URL 运行受速率限制的 Nuclei 模板检查。
+
+  - id: nuclei_batch
+    service: nuclei-scan
+    kind: job
+    transport: compose
+    image: projectdiscovery/nuclei:v3.4.10@sha256:aeb5ea2db32a252b8135707d2ad0e89b90e19a18ea7816d38759bc51efb46b97
+    profile: web
+    compose_profile: web-job
+    risk: medium
+    approval: human
+    enabled: true
+    target:
+      input: url_file
+      allowlist_required: true
+      supports_multiple: true
+    limits:
+      timeout_seconds: 1800
+      rate: 30
+      concurrency: 10
+      max_targets: 100
+    output:
+      format: json
+      directory: /reports
+      report_pattern: nuclei-*.json
+    result_adapter: nuclei_json
+    description: 以一次性 Compose 任务扫描白名单 URL 列表。

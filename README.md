@@ -116,7 +116,7 @@ CyberStrikeAI connects planning, execution, human oversight, evidence, and repla
 
 ### Tools and knowledge
 
-- 🧰 **Security tools** include 100+ curated YAML recipes with custom extensions and role-scoped access.
+- 🧰 **Security tools** include 90 curated YAML recipes with custom extensions and role-scoped access.
 - 🔌 **MCP integration** supports HTTP, stdio, SSE, external federation, and dynamic tool discovery.
 - ⏱️ **Resilient tool execution** runs blocking MCP/tool calls in workers with bounded agent waits, resumable `execution_id` polling, cancellation, per-server circuit breakers, concurrency limits, and unified output caps.
 - 🎯 **Agent Skills** follow the standard Skill layout and support progressive, on-demand loading.
@@ -162,26 +162,21 @@ CyberStrikeAI includes optional integrations under `plugins/`.
 
 ## Tool Overview
 
-CyberStrikeAI ships with 100+ curated tools covering the whole kill chain:
+CyberStrikeAI currently ships with 90 curated tool definitions covering the whole kill chain:
 
 <details>
 <summary><strong>View the complete tool categories</strong></summary>
 
-- **Network Scanners** – nmap, masscan, rustscan, arp-scan, nbtscan
-- **Web & App Scanners** – sqlmap, nikto, dirb, gobuster, feroxbuster, ffuf, httpx
-- **Vulnerability Scanners** – nuclei, wpscan, wafw00f, dalfox, xsser
-- **Subdomain Enumeration** – subfinder, amass, findomain, dnsenum, fierce
-- **Network Space Search Engines** – fofa_search, zoomeye_search, quake_search, shodan_search
-- **API Security** – graphql-scanner, arjun, api-fuzzer, api-schema-analyzer
-- **Container Security** – trivy, clair, docker-bench-security, kube-bench, kube-hunter
-- **Cloud Security** – prowler, scout-suite, cloudmapper, pacu, terrascan, checkov
-- **Binary Analysis** – gdb, radare2, ghidra, objdump, strings, binwalk
-- **Exploitation** – metasploit, msfvenom, pwntools, ropper, ropgadget
-- **Password Cracking** – hashcat, john, hashpump
-- **Forensics** – volatility, volatility3, foremost, steghide, exiftool
-- **Post-Exploitation** – linpeas, winpeas, mimikatz, bloodhound, impacket, responder
-- **CTF Utilities** – stegsolve, zsteg, hash-identifier, fcrackzip, pdfcrack, cyberchef
-- **System Helpers** – exec, create-file, delete-file, list-files, modify-file
+- **Network Reconnaissance** – amass, arp-scan, dnsenum, fierce, gau, katana, masscan, nbtscan, nmap, rustscan, subfinder, waybackurls
+- **Web/API Testing** – arjun, dalfox, dirsearch, dotdotpwn, ffuf, graphql-scanner, http-framework-test, jaeles, jwt-analyzer, nikto, nuclei, paramspider, sqlmap, wafw00f, wpscan, x8, xsser, zap
+- **Cloud and Container Security** – checkov, clair, cloudmapper, falco, kube-bench, kube-hunter, pacu, prowler, scout-suite, terrascan, trivy
+- **Identity and Lateral Testing** – bloodhound, enum4linux-ng, hydra, impacket, netexec, responder, rpcclient, smbmap
+- **Exploitation and Post-Exploitation** – linpeas, metasploit, msfvenom
+- **Binary and Forensics** – angr, binwalk, checksec, exiftool, foremost, gdb, ghidra, hashcat, hashpump, john, objdump, one-gadget, pwninit, pwntools, radare2, ropgadget, ropper, steghide, strings, volatility3, xxd, zsteg
+- **External Intelligence** – dnslog, fofa_search, quake_search, shodan_search, virustotal_search, zoomeye_search
+- **Control-plane Helpers** – exec, execute-python-script, install-python-package, query_execution_result
+
+See `deploy/tools/inventory.yaml` for the complete `tools/*.yaml` inventory, including disabled entries and container migration status.
 
 </details>
 
@@ -237,7 +232,7 @@ The `run.sh` script will automatically:
      ```
    - Or edit `config.yaml` directly before launching. `ai.default_channel` is used for new conversations and tasks that do not explicitly select a channel; the chat page can also select any saved channel per session.
 2. **Login** - On first startup the console prints an auto-generated initial `admin` password; create accounts from **Platform permissions → User management**
-3. **Install security tools (optional)** - Install tools from `tools/` as needed; missing tools are skipped or substituted at runtime. Common examples:
+3. **Prepare security tools** - The control plane keeps all 90 `tools/*.yaml` definitions and their schemas. Install the corresponding command in a managed runtime or use the independent [Docker tool plane](docs/zh-CN/tool-plane.md); missing binaries return an explicit execution error and are not silently presented as containerized. Common examples:
 
    **macOS (Homebrew):**
    ```bash
@@ -343,7 +338,7 @@ CyberStrikeAI/
 ├── cmd/                 # Server, MCP stdio entrypoints, tooling
 ├── internal/            # Agent, MCP core, handlers, C2 (`internal/c2`), security executor
 ├── web/                 # Static SPA + templates
-├── tools/               # YAML tool recipes (100+ examples provided)
+├── tools/               # YAML tool recipes (90 definitions currently provided)
 ├── roles/               # Role configurations (12+ predefined security testing roles)
 ├── skills/              # Agent Skills dirs (SKILL.md + optional files; demo: cyberstrike-eino-demo)
 ├── agents/              # Multi-agent Markdown (orchestrator.md + sub-agent *.md)

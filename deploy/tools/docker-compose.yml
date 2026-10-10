@@ -1,0 +1,214 @@
+name: ${TOOLS_COMPOSE_PROJECT:-cyberstrike-tools}
+
+services:
+  # Generic compatibility adapter. It is intentionally opt-in: select one
+  # family runtime image and either TOOL_FAMILY or a comma-separated subset of
+  # the repository's tools/*.yaml definitions. This keeps the schema/argument
+  # contract aligned with the current project while allowing separate family
+  # images instead of one monolithic scanner image.
+  tool-compat-mcp:
+    profiles: ["compat-mcp"]
+    build:
+      context: ../..
+      dockerfile: deploy/tools/services/tool-mcp/Dockerfile
+      args:
+        TOOL_BASE_IMAGE: ${TOOL_RUNTIME_IMAGE:-debian:bookworm-slim}
+    init: true
+    environment:
+      TOOL_IDS: ${TOOL_IDS:-}
+      TOOL_DEFINITIONS_DIR: /etc/cyberstrike/tools
+      TOOL_CATALOG: /etc/cyberstrike/catalog.yaml
+      TOOL_MCP_LISTEN: :8080
+      TOOL_MCP_TOKEN: ${TOOL_MCP_TOKEN:-}
+      TOOL_MCP_AUTH_HEADER: ${TOOL_MCP_AUTH_HEADER:-X-Tool-Token}
+      TOOL_ALLOWED_HOSTS: ${TOOL_ALLOWED_HOSTS:-}
+      TOOL_PRECHECK: ${TOOL_PRECHECK:-1}
+      TOOL_RUNTIME_IMAGE: ${TOOL_RUNTIME_IMAGE:-}
+      TOOL_WORKDIR: /workspace
+      REPORTS_DIR: /reports
+      REPORT_REFERENCE_ROOT: /app/tool_reports
+      HOME: /tmp
+    expose: ["8080"]
+    volumes:
+      - ${TOOL_REGISTRY_DIR:-../../tools}:/etc/cyberstrike/tools:ro
+      - ${TOOL_WORKSPACE_DIR:-./data/workspace}:/workspace:rw
+      - ${REPORTS_DIR:-./data/reports}:/reports:rw
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=512m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: ${TOOL_COMPAT_MEMORY_LIMIT:-2g}
+    cpus: ${TOOL_COMPAT_CPUS:-2}
+    pids_limit: ${TOOL_COMPAT_PIDS_LIMIT:-256}
+    networks: [control, egress]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/tool-mcp", "-probe"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+  # Long-running MCP adapter for Nuclei. It is built on the Nuclei image and
+  # exposes only the catalog-approved nuclei_scan operation.
+  nuclei-mcp:
+    profiles: ["web-mcp"]
+    build:
+      context: ../..
+      dockerfile: deploy/tools/services/tool-mcp/Dockerfile
+      args:
+        TOOL_BASE_IMAGE: ${NUCLEI_IMAGE:-projectdiscovery/nuclei:v3.4.10@sha256:aeb5ea2db32a252b8135707d2ad0e89b90e19a18ea7816d38759bc51efb46b97}
+    init: true
+    environment:
+      TOOL_ID: nuclei_scan
+      TOOL_CATALOG: /etc/cyberstrike/catalog.yaml
+      TOOL_MCP_LISTEN: :8080
+      TOOL_MCP_TOKEN: ${TOOL_MCP_TOKEN:-}
+      TOOL_MCP_AUTH_HEADER: ${TOOL_MCP_AUTH_HEADER:-X-Tool-Token}
+      TOOL_ALLOWED_HOSTS: ${TOOL_ALLOWED_HOSTS:-}
+      REPORTS_DIR: /reports
+      REPORT_REFERENCE_ROOT: /app/tool_reports
+      HOME: /tmp
+    expose: ["8080"]
+    volumes:
+      - ${REPORTS_DIR:-./data/reports}:/reports:rw
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=512m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: ${NUCLEI_MEMORY_LIMIT:-2g}
+    cpus: ${NUCLEI_CPUS:-2}
+    pids_limit: ${NUCLEI_PIDS_LIMIT:-256}
+    networks: [control, egress]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/tool-mcp", "-probe"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+  # Long-running MCP adapter for ZAP baseline.
+  zap-mcp:
+    profiles: ["baseline-mcp"]
+    build:
+      context: ../..
+      dockerfile: deploy/tools/services/tool-mcp/Dockerfile
+      args:
+        TOOL_BASE_IMAGE: ${ZAP_IMAGE:-ghcr.io/zaproxy/zaproxy:2.16.1@sha256:7840969c7c9fead565bf9734b12f49f6886db90b1d35b1f74d79710bbd081dab}
+    init: true
+    environment:
+      TOOL_ID: zap_baseline
+      TOOL_CATALOG: /etc/cyberstrike/catalog.yaml
+      TOOL_MCP_LISTEN: :8080
+      TOOL_MCP_TOKEN: ${TOOL_MCP_TOKEN:-}
+      TOOL_MCP_AUTH_HEADER: ${TOOL_MCP_AUTH_HEADER:-X-Tool-Token}
+      TOOL_ALLOWED_HOSTS: ${TOOL_ALLOWED_HOSTS:-}
+      REPORTS_DIR: /reports
+      REPORT_REFERENCE_ROOT: /app/tool_reports
+      HOME: /tmp
+      ZAP_LOCALE: ${ZAP_LOCALE:-zh_CN}
+    expose: ["8080"]
+    volumes:
+      - ${REPORTS_DIR:-./data/reports}:/reports:rw
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=1g
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: ${ZAP_MEMORY_LIMIT:-2g}
+    cpus: ${ZAP_CPUS:-2}
+    pids_limit: ${ZAP_PIDS_LIMIT:-256}
+    networks: [control, egress]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/tool-mcp", "-probe"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+  # One-shot service. Keep the target list and reports outside the image so a
+  # job can be reviewed, repeated or imported into CyberStrikeAI afterwards.
+  nuclei-scan:
+    profiles: ["web-job"]
+    image: ${NUCLEI_IMAGE:-projectdiscovery/nuclei:v3.4.10@sha256:aeb5ea2db32a252b8135707d2ad0e89b90e19a18ea7816d38759bc51efb46b97}
+    init: true
+    entrypoint: ["/bin/sh"]
+    command: ["/scripts/run-nuclei.sh"]
+    environment:
+      TARGETS_FILE: /targets/targets.txt
+      REPORTS_DIR: /reports
+      MAX_TARGETS: ${MAX_TARGETS:-100}
+      NUCLEI_SEVERITY: ${NUCLEI_SEVERITY:-medium,high,critical}
+      NUCLEI_RATE_LIMIT: ${NUCLEI_RATE_LIMIT:-30}
+      NUCLEI_CONCURRENCY: ${NUCLEI_CONCURRENCY:-10}
+      NUCLEI_BULK_SIZE: ${NUCLEI_BULK_SIZE:-1}
+      TOOL_ALLOWED_HOSTS: ${TOOL_ALLOWED_HOSTS:-}
+    volumes:
+      - ${TARGETS_DIR:-./data/targets}:/targets:ro
+      - ${REPORTS_DIR:-./data/reports}:/reports:rw
+      - ./scripts:/scripts:ro
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=256m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: ${NUCLEI_MEMORY_LIMIT:-2g}
+    cpus: ${NUCLEI_CPUS:-2}
+    pids_limit: ${NUCLEI_PIDS_LIMIT:-256}
+    networks: [egress]
+    restart: "no"
+    healthcheck:
+      disable: true
+
+  # One-shot low-impact baseline. Use a single URL per invocation; the target
+  # is supplied through TARGET_URL after the project allowlist is checked.
+  zap-baseline:
+    profiles: ["baseline-job"]
+    image: ${ZAP_IMAGE:-ghcr.io/zaproxy/zaproxy:2.16.1@sha256:7840969c7c9fead565bf9734b12f49f6886db90b1d35b1f74d79710bbd081dab}
+    init: true
+    entrypoint: ["/bin/sh"]
+    command: ["/scripts/run-zap-baseline.sh"]
+    environment:
+      # The wrapper rejects an empty value. Keeping interpolation optional
+      # allows `docker compose config` to validate the project in CI.
+      TARGET_URL: ${TARGET_URL:-}
+      REPORTS_DIR: /reports
+      TOOL_ALLOWED_HOSTS: ${TOOL_ALLOWED_HOSTS:-}
+      ZAP_SPIDER_MINUTES: ${ZAP_SPIDER_MINUTES:-1}
+      ZAP_LOCALE: ${ZAP_LOCALE:-zh_CN}
+    volumes:
+      - ${REPORTS_DIR:-./data/reports}:/reports:rw
+      - ./scripts:/scripts:ro
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=512m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: ${ZAP_MEMORY_LIMIT:-2g}
+    cpus: ${ZAP_CPUS:-2}
+    pids_limit: ${ZAP_PIDS_LIMIT:-256}
+    networks: [egress]
+    restart: "no"
+    healthcheck:
+      disable: true
+
+networks:
+  control:
+    external: true
+    name: ${CYBERSTRIKE_CONTROL_NETWORK:-cyberstrike-control}
+  egress:
+    name: ${TOOLS_EGRESS_NETWORK:-cyberstrike-tools-egress}

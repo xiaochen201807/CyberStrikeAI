@@ -43,7 +43,7 @@ Use multi-line text and include:
 - If `short_description` is missing, the system uses the first line or first 100 characters of `description`.
 - Full descriptions are available via MCP `resources/read` (URI: `tool://tool_name`).
 
-This reduces token usage, especially with many tools (e.g. 100+).
+This reduces token usage, especially with many tools (the repository currently ships 90 definitions).
 
 ## Parameter Definition
 

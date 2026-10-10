@@ -1,0 +1,65 @@
+name: ${CONTROL_COMPOSE_PROJECT:-cyberstrike-control}
+
+services:
+  cyberstrike-ai:
+    build:
+      context: ../..
+      dockerfile: deploy/control/Dockerfile
+    image: ${CYBERSTRIKE_IMAGE:-cyberstrike-ai:local}
+    init: true
+    restart: unless-stopped
+    ports:
+      # Keep the control plane local by default. Set CYBERSTRIKE_BIND only
+      # when a reverse proxy or an explicitly protected network should reach it.
+      - "${CYBERSTRIKE_BIND:-127.0.0.1}:${CYBERSTRIKE_PORT:-8080}:8080"
+    environment:
+      CYBERSTRIKE_CONFIG: /app/config/config.yaml
+      # Use the same value as deploy/tools/.env when external tool MCPs are enabled.
+      TOOL_MCP_TOKEN: ${TOOL_MCP_TOKEN:-}
+    volumes:
+      - control-config:/app/config
+      - control-data:/app/data
+      - control-log:/app/log
+      - control-chat-uploads:/app/chat_uploads
+      - control-tmp:/app/tmp
+      - ${TOOL_REPORTS_DIR:-../tools/data/reports}:/app/tool_reports:ro
+      - control-roles:/app/roles
+      - control-roles:/app/config/roles
+      - control-skills:/app/skills
+      - control-skills:/app/config/skills
+      - control-agents:/app/agents
+      - control-agents:/app/config/agents
+      - control-knowledge:/app/knowledge_base
+      # The repository's 90 tool definitions remain available to the
+      # application.  This is a registry mount, not a scanner binary bundle.
+      # Set CYBERSTRIKE_TOOLS_DIR to a managed/custom registry when deploying
+      # outside this checkout.
+      - ${CYBERSTRIKE_TOOLS_DIR:-../../tools}:/app/tools:ro
+      - ${CYBERSTRIKE_TOOLS_DIR:-../../tools}:/app/config/tools:ro
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=256m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: ${CYBERSTRIKE_MEMORY_LIMIT:-2g}
+    cpus: ${CYBERSTRIKE_CPUS:-2}
+    pids_limit: 256
+    networks:
+      - control
+
+volumes:
+  control-config:
+  control-data:
+  control-log:
+  control-chat-uploads:
+  control-tmp:
+  control-roles:
+  control-skills:
+  control-agents:
+  control-knowledge:
+
+networks:
+  control:
+    name: ${CYBERSTRIKE_CONTROL_NETWORK:-cyberstrike-control}

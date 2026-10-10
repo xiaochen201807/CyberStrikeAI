@@ -1,0 +1,1001 @@
+schema_version: 1
+source: tools
+total: 90
+enabled: 78
+disabled: 12
+tools:
+    - id: amass
+      source: tools/amass.yaml
+      command: amass
+      enabled: true
+      layer: control
+      family: recon
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: angr
+      source: tools/angr.yaml
+      command: python3
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: api-schema-analyzer
+      source: tools/api-schema-analyzer.yaml
+      command: spectral
+      enabled: true
+      layer: control
+      family: utility
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: arjun
+      source: tools/arjun.yaml
+      command: arjun
+      enabled: true
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: arp-scan
+      source: tools/arp-scan.yaml
+      command: arp-scan
+      enabled: true
+      layer: control
+      family: recon
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: binwalk
+      source: tools/binwalk.yaml
+      command: binwalk
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: bloodhound
+      source: tools/bloodhound.yaml
+      command: bloodhound-python
+      enabled: true
+      layer: control
+      family: identity
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: checkov
+      source: tools/checkov.yaml
+      command: checkov
+      enabled: true
+      layer: control
+      family: cloud
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: checksec
+      source: tools/checksec.yaml
+      command: checksec
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: clair
+      source: tools/clair.yaml
+      command: clair
+      enabled: false
+      layer: control
+      family: cloud
+      runtime: native
+      containerized: false
+      availability: disabled
+      binary_status: disabled
+      migration: preserved
+    - id: cloudmapper
+      source: tools/cloudmapper.yaml
+      command: cloudmapper
+      enabled: true
+      layer: control
+      family: cloud
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: dalfox
+      source: tools/dalfox.yaml
+      command: dalfox
+      enabled: true
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: dirsearch
+      source: tools/dirsearch.yaml
+      command: dirsearch
+      enabled: true
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: dnsenum
+      source: tools/dnsenum.yaml
+      command: dnsenum
+      enabled: true
+      layer: control
+      family: recon
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: dnslog
+      source: tools/dnslog.yaml
+      command: python3
+      enabled: true
+      layer: control
+      family: external-intel
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: dotdotpwn
+      source: tools/dotdotpwn.yaml
+      command: dotdotpwn
+      enabled: true
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: enum4linux-ng
+      source: tools/enum4linux-ng.yaml
+      command: enum4linux-ng
+      enabled: true
+      layer: control
+      family: identity
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: exec
+      source: tools/exec.yaml
+      command: sh
+      enabled: true
+      layer: control
+      family: control
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: execute-python-script
+      source: tools/execute-python-script.yaml
+      command: /bin/bash
+      enabled: true
+      layer: control
+      family: control
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: exiftool
+      source: tools/exiftool.yaml
+      command: exiftool
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: falco
+      source: tools/falco.yaml
+      command: falco
+      enabled: true
+      layer: control
+      family: cloud
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: feroxbuster
+      source: tools/feroxbuster.yaml
+      command: feroxbuster
+      enabled: false
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: disabled
+      binary_status: disabled
+      migration: preserved
+    - id: ffuf
+      source: tools/ffuf.yaml
+      command: ffuf
+      enabled: true
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: fierce
+      source: tools/fierce.yaml
+      command: fierce
+      enabled: true
+      layer: control
+      family: recon
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: fofa_search
+      source: tools/fofa_search.yaml
+      command: python3
+      enabled: false
+      layer: control
+      family: external-intel
+      runtime: native
+      containerized: false
+      availability: disabled
+      binary_status: disabled
+      migration: preserved
+    - id: foremost
+      source: tools/foremost.yaml
+      command: foremost
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: fscan
+      source: tools/fscan.yaml
+      command: fscan
+      enabled: false
+      layer: control
+      family: recon
+      runtime: native
+      containerized: false
+      availability: disabled
+      binary_status: disabled
+      migration: preserved
+    - id: gau
+      source: tools/gau.yaml
+      command: gau
+      enabled: true
+      layer: control
+      family: recon
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: gdb
+      source: tools/gdb.yaml
+      command: gdb
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: ghidra
+      source: tools/ghidra.yaml
+      command: analyzeHeadless
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: gobuster
+      source: tools/gobuster.yaml
+      command: gobuster
+      enabled: false
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: disabled
+      binary_status: disabled
+      migration: preserved
+    - id: graphql-scanner
+      source: tools/graphql-scanner.yaml
+      command: graphqlmap
+      enabled: true
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: hashcat
+      source: tools/hashcat.yaml
+      command: hashcat
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: hashpump
+      source: tools/hashpump.yaml
+      command: hashpump
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: http-framework-test
+      source: tools/http-framework-test.yaml
+      command: python3
+      enabled: true
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: hydra
+      source: tools/hydra.yaml
+      command: hydra
+      enabled: true
+      layer: control
+      family: identity
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: impacket
+      source: tools/impacket.yaml
+      command: python3
+      enabled: true
+      layer: control
+      family: identity
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: install-python-package
+      source: tools/install-python-package.yaml
+      command: /bin/bash
+      enabled: true
+      layer: control
+      family: control
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: jaeles
+      source: tools/jaeles.yaml
+      command: jaeles
+      enabled: true
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: john
+      source: tools/john.yaml
+      command: john
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: jwt-analyzer
+      source: tools/jwt-analyzer.yaml
+      command: jwt_tool
+      enabled: true
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: katana
+      source: tools/katana.yaml
+      command: katana
+      enabled: true
+      layer: control
+      family: recon
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: kube-bench
+      source: tools/kube-bench.yaml
+      command: kube-bench
+      enabled: true
+      layer: control
+      family: cloud
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: kube-hunter
+      source: tools/kube-hunter.yaml
+      command: kube-hunter
+      enabled: true
+      layer: control
+      family: cloud
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: libc-database
+      source: tools/libc-database.yaml
+      command: python3
+      enabled: true
+      layer: control
+      family: utility
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: lightx
+      source: tools/lightx.yaml
+      command: lightx
+      enabled: false
+      layer: control
+      family: utility
+      runtime: native
+      containerized: false
+      availability: disabled
+      binary_status: disabled
+      migration: preserved
+    - id: linpeas
+      source: tools/linpeas.yaml
+      command: linpeas.sh
+      enabled: true
+      layer: control
+      family: exploitation
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: masscan
+      source: tools/masscan.yaml
+      command: masscan
+      enabled: true
+      layer: control
+      family: recon
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: metasploit
+      source: tools/metasploit.yaml
+      command: python3
+      enabled: true
+      layer: control
+      family: exploitation
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: msfvenom
+      source: tools/msfvenom.yaml
+      command: msfvenom
+      enabled: true
+      layer: control
+      family: exploitation
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: nbtscan
+      source: tools/nbtscan.yaml
+      command: nbtscan
+      enabled: true
+      layer: control
+      family: recon
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: netexec
+      source: tools/netexec.yaml
+      command: netexec
+      enabled: true
+      layer: control
+      family: identity
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: nikto
+      source: tools/nikto.yaml
+      command: nikto
+      enabled: true
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: nmap
+      source: tools/nmap.yaml
+      command: nmap
+      enabled: true
+      layer: control
+      family: recon
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: nuclei
+      source: tools/nuclei.yaml
+      command: nuclei
+      enabled: true
+      layer: tool-plane
+      family: web
+      runtime: external-adapter
+      containerized: true
+      adapter: nuclei_scan
+      availability: enabled
+      binary_status: adapter-ready
+      migration: adapter-ready
+      notes: 已有独立工具平面适配器；工具 YAML 仍保留，保证原有名称和参数兼容。
+    - id: objdump
+      source: tools/objdump.yaml
+      command: objdump
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: one-gadget
+      source: tools/one-gadget.yaml
+      command: one_gadget
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: pacu
+      source: tools/pacu.yaml
+      command: pacu
+      enabled: false
+      layer: control
+      family: cloud
+      runtime: native
+      containerized: false
+      availability: disabled
+      binary_status: disabled
+      migration: preserved
+    - id: paramspider
+      source: tools/paramspider.yaml
+      command: paramspider
+      enabled: true
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: prowler
+      source: tools/prowler.yaml
+      command: prowler
+      enabled: true
+      layer: control
+      family: cloud
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: pwninit
+      source: tools/pwninit.yaml
+      command: pwninit
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: pwntools
+      source: tools/pwntools.yaml
+      command: python3
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: quake_search
+      source: tools/quake_search.yaml
+      command: python3
+      enabled: false
+      layer: control
+      family: external-intel
+      runtime: native
+      containerized: false
+      availability: disabled
+      binary_status: disabled
+      migration: preserved
+    - id: query_execution_result
+      source: tools/query-execution-result.yaml
+      command: internal:query_execution_result
+      enabled: true
+      layer: control
+      family: control
+      runtime: builtin
+      containerized: false
+      availability: builtin
+      binary_status: builtin
+      migration: preserved
+      notes: 由 CyberStrikeAI 控制平面内部实现，不能迁移为外部命令容器。
+    - id: radare2
+      source: tools/radare2.yaml
+      command: r2
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: responder
+      source: tools/responder.yaml
+      command: python3
+      enabled: true
+      layer: control
+      family: identity
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: ropgadget
+      source: tools/ropgadget.yaml
+      command: ROPgadget
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: ropper
+      source: tools/ropper.yaml
+      command: ropper
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: rpcclient
+      source: tools/rpcclient.yaml
+      command: python3
+      enabled: true
+      layer: control
+      family: identity
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: rustscan
+      source: tools/rustscan.yaml
+      command: rustscan
+      enabled: true
+      layer: control
+      family: recon
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: scout-suite
+      source: tools/scout-suite.yaml
+      command: scout
+      enabled: true
+      layer: control
+      family: cloud
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: shodan_search
+      source: tools/shodan_search.yaml
+      command: python3
+      enabled: false
+      layer: control
+      family: external-intel
+      runtime: native
+      containerized: false
+      availability: disabled
+      binary_status: disabled
+      migration: preserved
+    - id: smbmap
+      source: tools/smbmap.yaml
+      command: smbmap
+      enabled: true
+      layer: control
+      family: identity
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: sqlmap
+      source: tools/sqlmap.yaml
+      command: sqlmap
+      enabled: true
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: steghide
+      source: tools/steghide.yaml
+      command: steghide
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: strings
+      source: tools/strings.yaml
+      command: strings
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: subfinder
+      source: tools/subfinder.yaml
+      command: subfinder
+      enabled: true
+      layer: control
+      family: recon
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: terrascan
+      source: tools/terrascan.yaml
+      command: terrascan
+      enabled: true
+      layer: control
+      family: cloud
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: trivy
+      source: tools/trivy.yaml
+      command: trivy
+      enabled: true
+      layer: control
+      family: cloud
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: virustotal_search
+      source: tools/virustotal_search.yaml
+      command: python3
+      enabled: false
+      layer: control
+      family: external-intel
+      runtime: native
+      containerized: false
+      availability: disabled
+      binary_status: disabled
+      migration: preserved
+    - id: volatility3
+      source: tools/volatility3.yaml
+      command: volatility3
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: wafw00f
+      source: tools/wafw00f.yaml
+      command: wafw00f
+      enabled: true
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: waybackurls
+      source: tools/waybackurls.yaml
+      command: waybackurls
+      enabled: true
+      layer: control
+      family: recon
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: wpscan
+      source: tools/wpscan.yaml
+      command: wpscan
+      enabled: true
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: x8
+      source: tools/x8.yaml
+      command: x8
+      enabled: true
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: xsser
+      source: tools/xsser.yaml
+      command: xsser
+      enabled: true
+      layer: control
+      family: web
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: xxd
+      source: tools/xxd.yaml
+      command: xxd
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved
+    - id: zap
+      source: tools/zap.yaml
+      command: zap-cli
+      enabled: false
+      layer: tool-plane
+      family: web
+      runtime: external-adapter
+      containerized: true
+      adapter: zap_baseline
+      availability: disabled
+      binary_status: disabled
+      migration: adapter-ready
+      notes: 已有独立工具平面适配器；工具 YAML 仍保留，保证原有名称和参数兼容。
+    - id: zoomeye_search
+      source: tools/zoomeye_search.yaml
+      command: python3
+      enabled: false
+      layer: control
+      family: external-intel
+      runtime: native
+      containerized: false
+      availability: disabled
+      binary_status: disabled
+      migration: preserved
+    - id: zsteg
+      source: tools/zsteg.yaml
+      command: zsteg
+      enabled: true
+      layer: control
+      family: binary-forensics
+      runtime: native
+      containerized: false
+      availability: enabled
+      binary_status: unverified
+      migration: preserved

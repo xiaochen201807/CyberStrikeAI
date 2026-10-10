@@ -10,7 +10,7 @@
 
 CyberStrikeAI 将规划、执行、人工监督、证据与复盘连接在同一个可审计工作空间中。项目基于 Go 构建，融合 Eino 智能体、MCP 原生工具、RAG 知识、可视化工作流以及攻击链建模与分析能力，面向已获得明确授权的安全任务。
 
-**从这里开始：** [快速上手](#快速上手一条命令部署) · [中文文档](docs/zh-CN/README.md) · [安全加固](docs/zh-CN/security-hardening.md)
+**从这里开始：** [快速上手](#快速上手一条命令部署) · [Docker 工具平面](docs/zh-CN/tool-plane.md) · [中文文档](docs/zh-CN/README.md) · [安全加固](docs/zh-CN/security-hardening.md)
 
 > [!IMPORTANT]
 > 仅可对自有系统或已获得明确授权的目标使用 CyberStrikeAI。在共享或生产环境启用高风险工具、WebShell 或 C2 前，请先阅读[安全模型](docs/zh-CN/security-model.md)和[安全加固指南](docs/zh-CN/security-hardening.md)。
@@ -115,7 +115,7 @@ CyberStrikeAI 将规划、执行、人工监督、证据与复盘连接在同一
 
 ### 工具与知识扩展
 
-- 🧰 **安全工具**：提供 100+ 精选 YAML 工具配方，支持自定义扩展和按角色控制。
+- 🧰 **安全工具**：提供 90 个精选 YAML 工具配方，支持自定义扩展和按角色控制。
 - 🔌 **MCP 集成**：支持 HTTP、stdio、SSE、外部 MCP 联邦和动态工具发现。
 - ⏱️ **弹性工具执行**：阻塞型 MCP/工具调用交给 worker 执行，Agent 只有限等待；支持 `execution_id` 多轮等待、主动取消、单 server 熔断、并发限制和统一输出兜底。
 - 🎯 **Agent Skills**：遵循标准 Skill 目录结构，支持渐进式按需加载。
@@ -161,26 +161,21 @@ CyberStrikeAI 将规划、执行、人工监督、证据与复盘连接在同一
 
 ## 工具概览
 
-系统预置 100+ 渗透/攻防工具，覆盖完整攻击链：
+系统当前预置 90 个渗透/攻防工具定义，覆盖完整攻击链：
 
 <details>
 <summary><strong>查看完整工具分类</strong></summary>
 
-- **网络扫描**：nmap、masscan、rustscan、arp-scan、nbtscan
-- **Web 应用扫描**：sqlmap、nikto、dirb、gobuster、feroxbuster、ffuf、httpx
-- **漏洞扫描**：nuclei、wpscan、wafw00f、dalfox、xsser
-- **子域名枚举**：subfinder、amass、findomain、dnsenum、fierce
-- **网络空间搜索引擎**：fofa_search、zoomeye_search、quake_search、shodan_search
-- **API 安全**：graphql-scanner、arjun、api-fuzzer、api-schema-analyzer
-- **容器安全**：trivy、clair、docker-bench-security、kube-bench、kube-hunter
-- **云安全**：prowler、scout-suite、cloudmapper、pacu、terrascan、checkov
-- **二进制分析**：gdb、radare2、ghidra、objdump、strings、binwalk
-- **漏洞利用**：metasploit、msfvenom、pwntools、ropper、ropgadget
-- **密码破解**：hashcat、john、hashpump
-- **取证分析**：volatility、volatility3、foremost、steghide、exiftool
-- **后渗透**：linpeas、winpeas、mimikatz、bloodhound、impacket、responder
-- **CTF 实用工具**：stegsolve、zsteg、hash-identifier、fcrackzip、pdfcrack、cyberchef
-- **系统辅助**：exec、create-file、delete-file、list-files、modify-file
+- **网络侦察**：amass、arp-scan、dnsenum、fierce、gau、katana、masscan、nbtscan、nmap、rustscan、subfinder、waybackurls
+- **Web/API 测试**：arjun、dalfox、dirsearch、dotdotpwn、ffuf、graphql-scanner、http-framework-test、jaeles、jwt-analyzer、nikto、nuclei、paramspider、sqlmap、wafw00f、wpscan、x8、xsser、zap
+- **云与容器安全**：checkov、clair、cloudmapper、falco、kube-bench、kube-hunter、pacu、prowler、scout-suite、terrascan、trivy
+- **身份与横向测试**：bloodhound、enum4linux-ng、hydra、impacket、netexec、responder、rpcclient、smbmap
+- **利用与后渗透**：linpeas、metasploit、msfvenom
+- **二进制与取证**：angr、binwalk、checksec、exiftool、foremost、gdb、ghidra、hashcat、hashpump、john、objdump、one-gadget、pwninit、pwntools、radare2、ropgadget、ropper、steghide、strings、volatility3、xxd、zsteg
+- **外部情报**：dnslog、fofa_search、quake_search、shodan_search、virustotal_search、zoomeye_search
+- **控制平面工具**：exec、execute-python-script、install-python-package、query_execution_result
+
+`deploy/tools/inventory.yaml` 是按 `tools/*.yaml` 生成的完整清单，包含禁用工具和每项的容器迁移状态。
 
 </details>
 
@@ -236,7 +231,20 @@ chmod +x run.sh && ./run.sh
      ```
    - 或启动前直接编辑 `config.yaml` 文件。`ai.default_channel` 会作为新对话和未显式选择通道任务的默认模型；对话页也可以在会话设置里选择某个已保存通道。
 2. **登录系统** - 首次启动时控制台会显示自动生成的 `admin` 初始密码；也可在「平台权限 → 用户管理」中创建账号
-3. **安装安全工具（可选）** - 按需安装 `tools/` 目录中的工具；未安装的工具在执行时会自动跳过或改用替代方案。常用示例：
+3. **准备安全工具** - 项目现有 90 个 `tools/*.yaml` 定义（78 个默认启用、12 个默认禁用）会随控制平面加载，保证原有工具名称和参数不丢失。推荐使用独立的 [Docker 工具平面](docs/zh-CN/tool-plane.md)逐步承载扫描器二进制；当前已提供 Nuclei/ZAP 适配器，其余工具必须按清单迁移或在受管主机上安装对应命令。未安装的命令会在调用时返回明确错误，不会被假装成已容器化。常用示例：
+
+   **独立 Docker 工具平面（推荐）：**
+   ```bash
+   cd deploy/tools
+   cp .env.example .env
+   ./scripts/validate.sh
+   # 将已授权 URL 写入 data/targets/targets.txt 后执行
+   docker compose --profile web-job run --rm nuclei-scan
+   ```
+
+   报告会写入 `deploy/tools/data/reports/`，人工复核后再导入项目资产和漏洞记录。
+
+   **宿主机安装（开发/临时使用）：**
 
    **macOS（Homebrew）：**
    ```bash
@@ -323,7 +331,7 @@ ai:
 
 ## 相关文档
 
-- **新用户：** [部署指南](docs/zh-CN/deployment.md) → [配置参考](docs/zh-CN/configuration.md) → [排错指南](docs/zh-CN/troubleshooting.md)
+- **新用户：** [部署指南](docs/zh-CN/deployment.md) → [Docker 工具平面](docs/zh-CN/tool-plane.md) → [配置参考](docs/zh-CN/configuration.md) → [排错指南](docs/zh-CN/troubleshooting.md)
 - **运维人员：** [配置画像](docs/zh-CN/configuration-profiles.md) → [安全加固](docs/zh-CN/security-hardening.md) → [运维 Runbooks](docs/zh-CN/runbooks.md)
 - **集成开发：** [API 参考](docs/zh-CN/api-reference.md) → [API Recipes](docs/zh-CN/api-recipes.md) → [MCP 联邦](docs/zh-CN/mcp-federation.md)
 - **项目贡献：** [开发者指南](docs/zh-CN/developer-guide.md) → [测试指南](docs/zh-CN/testing.md) → [贡献规范](docs/zh-CN/contributing-guide.md)
@@ -336,11 +344,13 @@ CyberStrikeAI/
 ├── cmd/                 # Web 服务、MCP stdio 入口及辅助工具
 ├── internal/            # Agent、MCP 核心、路由、C2（`internal/c2`）与执行器
 ├── web/                 # 前端静态资源与模板
-├── tools/               # YAML 工具目录（含 100+ 示例）
+├── tools/               # YAML 工具目录（当前 90 个定义）
 ├── roles/               # 角色配置文件目录（含 12+ 预设安全测试角色）
 ├── skills/              # Agent Skills 目录（SKILL.md + 可选文件；示例 cyberstrike-eino-demo）
 ├── agents/              # 多代理 Markdown（orchestrator.md + 子代理 *.md）
 ├── docs/                # 专题文档（部署、配置、安全、API、知识库、C2、WebShell 等）
+├── deploy/control/      # 不含扫描器的 CyberStrikeAI 控制平面 Compose
+├── deploy/tools/        # 独立工具 Compose、工具目录和报告目录
 ├── images/              # 文档配图
 ├── config.yaml          # 运行配置
 ├── run.sh               # 启动脚本

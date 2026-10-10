@@ -2,6 +2,8 @@
 
 本文说明 CyberStrikeAI 的常见部署方式。生产环境部署前，请先阅读 [安全模型](security-model.md)，确认授权范围、认证、HITL、审计和高风险功能开关。
 
+如果需要可重复的工具运行环境，请同时阅读[独立 Docker 工具平面](tool-plane.md)。控制平面和工具平面使用两个 Compose 项目，扫描器镜像不再安装到 CyberStrikeAI 控制平面。
+
 ## 部署前准备
 
 基础依赖：
@@ -9,7 +11,7 @@
 - Go：用于源码运行或构建二进制。
 - Python：部分 MCP 服务或工具脚本需要 Python 运行环境。
 - SQLite：默认使用文件型数据库，无需单独服务。
-- 安全工具：`tools/` 中的 YAML 只是工具定义，实际命令如 `nmap`、`sqlmap`、`nuclei` 仍需安装到系统 PATH。
+- 安全工具：`tools/` 中的 90 个 YAML 是 Agent 命令定义，会随控制平面加载；推荐使用 `deploy/tools/` 中的独立 Compose 工具平面逐步提供扫描器二进制。目前 Nuclei/ZAP 已有适配器，其余命令需在受管运行时安装或按 `inventory.yaml` 迁移。
 - 模型服务：至少配置一个 `ai.channels` 通道；`provider: openai_compatible` 适用于 OpenAI 兼容 API，`provider: claude` 使用 Eino 原生 Claude 组件。
 
 建议目录：

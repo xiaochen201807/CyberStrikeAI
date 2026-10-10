@@ -188,7 +188,7 @@ tool_guard:
 #   review_edit → audit_agent_prompt_review_edit（可改参后放行）
 hitl:
   # 全局默认人机协同模式：off=关闭，approval=审批模式，review_edit=审查编辑；新建会话无独立配置时沿用
-  default_mode: off
+  default_mode: approval
   # 全局默认审批方：human=人工审批，audit_agent=审计 Agent；新建会话无独立配置时沿用
   default_reviewer: human
   # 全局默认审批等待时限（秒）：300=5分钟，0=不限时；新建会话无独立配置时沿用
@@ -432,9 +432,32 @@ mcp:
 # 外部 MCP 配置
 external_mcp:
   servers: {}
-# 内置 C2：本机仅做对话/知识库时可设为 false，不启动监听器、不注册 C2 MCP 工具；省略本段时默认启用
+  # 独立 Docker 工具平面示例（先在 deploy/tools/.env 中生成 TOOL_MCP_TOKEN，
+  # 再按需启用对应 Compose profile；不要把服务端口发布到公网）：
+  # servers:
+  #   tool-plane-nuclei:
+  #     type: sse
+  #     url: http://nuclei-mcp:8080/sse
+  #     headers:
+  #       X-Tool-Token: "${TOOL_MCP_TOKEN}"
+  #     external_mcp_enable: true
+  #   tool-plane-zap:
+  #     type: sse
+  #     url: http://zap-mcp:8080/sse
+  #     headers:
+  #       X-Tool-Token: "${TOOL_MCP_TOKEN}"
+  #     external_mcp_enable: true
+  #   # 通用兼容适配器按工具族启动后，可使用同样的 SSE 方式接入；
+  #   # 工具名会以 tool-plane-compat::nmap 形式出现在 Agent 中。
+  #   tool-plane-compat:
+  #     type: sse
+  #     url: http://tool-compat-mcp:8080/sse
+  #     headers:
+  #       X-Tool-Token: "${TOOL_MCP_TOKEN}"
+  #     external_mcp_enable: true
+# 内置 C2：默认关闭。只有在独立、明确授权的环境中完成额外审查后才启用。
 c2:
-  enabled: true
+  enabled: false
 # ============================================
 # 知识库相关配置
 # ============================================

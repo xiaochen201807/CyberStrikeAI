@@ -4,8 +4,8 @@
 
 ## 按目标开始
 
-- **快速体验**：[部署指南](deployment.md) → [配置参考](configuration.md) → [排错指南](troubleshooting.md)
-- **生产部署**：[配置画像](configuration-profiles.md) → [安全加固](security-hardening.md) → [运维 Runbooks](runbooks.md) → [审计与监控](audit-and-monitoring.md)
+- **快速体验**：[部署指南](deployment.md) → [Docker 工具平面](tool-plane.md) → [配置参考](configuration.md) → [排错指南](troubleshooting.md)
+- **生产部署**：[Docker 工具平面](tool-plane.md) → [配置画像](configuration-profiles.md) → [安全加固](security-hardening.md) → [运维 Runbooks](runbooks.md) → [审计与监控](audit-and-monitoring.md)
 - **接入与自动化**：[API 参考](api-reference.md) → [API Recipes](api-recipes.md) → [MCP 联邦](mcp-federation.md)
 - **参与开发**：[开发者指南](developer-guide.md) → [测试指南](testing.md) → [贡献规范](contributing-guide.md)
 
@@ -22,7 +22,7 @@
 
 ## 运维与参考
 
-- [部署指南](deployment.md) · [配置参考](configuration.md) · [配置画像](configuration-profiles.md)
+- [部署指南](deployment.md) · [Docker 工具平面](tool-plane.md) · [配置参考](configuration.md) · [配置画像](configuration-profiles.md)
 - [安全加固](security-hardening.md) · [审计与监控](audit-and-monitoring.md) · [运维 Runbooks](runbooks.md)
 - [API 参考](api-reference.md) · [API Recipes](api-recipes.md) · [排错指南](troubleshooting.md)
 

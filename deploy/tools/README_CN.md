@@ -8,7 +8,7 @@
 ```text
 deploy/tools/
   catalog.yaml              # 工具能力、风险、目标和报告契约
-  inventory.yaml            # 当前仓库 90 个工具定义的完整迁移状态
+  inventory.yaml            # 当前仓库 YAML 定义的完整迁移状态（精确计数与官方 100+ 口径分开记录）
   docker-compose.yml        # 工具容器运行定义
   docker-compose.runtime.yml # 8 个独立工具族运行时
   runtime/                  # 运行时构建脚本和族清单
@@ -26,6 +26,10 @@ exploitation、external-intel、utility 拆分的 8 个独立运行时镜像。�
 Shell/Python 能力由控制面镜像提供，12 个定义保持禁用。每个族镜像构建末尾都会运行
 `toolcatalog doctor --strict`，
 缺少命令会让 CI 失败，不会等到线上调用才暴露。
+
+`inventory.yaml` 中的 `count_scope: tools/*.yaml definitions`、`total`、`enabled` 和 `disabled`
+只统计本检出版本的 YAML 定义；`official_tool_surface: 100+` 对应上游 README 的产品口径，
+不把内置工具、外部 MCP 联邦或后续自定义扩展误算进 YAML 文件数。
 
 catalog 的 `profile` 是逻辑工具族；`compose_profile` 把长驻 MCP 和一次性任务分开，避免执行
 `docker compose --profile web-mcp up` 时误启动批量扫描任务。

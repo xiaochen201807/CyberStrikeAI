@@ -65,7 +65,8 @@ deploy/tools/inventory.yaml
 它们加入控制平面内部网络，不发布宿主机端口；CyberStrikeAI 使用 SSE 地址和 `X-Tool-Token`
 连接。控制平面本身不挂载 Docker Socket。
 
-`inventory.yaml` 才是当前项目 90 个 `tools/*.yaml` 定义的完整清单；`catalog.yaml` 是已经具备
+`inventory.yaml` 是当前项目精确 90 个 `tools/*.yaml` 定义的完整清单；其 `count_scope` 字段明确
+这是 YAML 文件计数，而上游 README 的官方产品口径是 100+。`catalog.yaml` 是已经具备
 隔离适配器的子集。需要迁移其他工具族时，使用 `tool-compat-mcp` 读取原 YAML，并为该工具族提供
 单独的运行时镜像；这样可以保留原工具接口，不需要把所有命令塞入一个大镜像。
 

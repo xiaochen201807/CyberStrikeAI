@@ -42,6 +42,9 @@ func TestBuildInventoryPreservesAllToolDefinitions(t *testing.T) {
 	if inv.Total != 3 || inv.Enabled != 2 || inv.Disabled != 1 {
 		t.Fatalf("unexpected counts: %#v", inv)
 	}
+	if inv.CountScope != "tools/*.yaml definitions" || inv.OfficialToolSurface != "100+" {
+		t.Fatalf("unexpected inventory scope metadata: %#v", inv)
+	}
 	byID := make(map[string]InventoryTool, len(inv.Tools))
 	for _, entry := range inv.Tools {
 		byID[entry.ID] = entry

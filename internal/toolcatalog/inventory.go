@@ -14,17 +14,25 @@ import (
 )
 
 // ToolInventory is the compatibility inventory for the repository's
-// agent-facing tools/*.yaml definitions.  The deployment catalog describes
-// isolated services; the inventory describes every tool the current
-// CyberStrikeAI project knows about so a deployment cannot silently drop a
+// agent-facing tools/*.yaml definitions. The deployment catalog describes
+// isolated services; the inventory describes every YAML definition the current
+// CyberStrikeAI checkout knows about so a deployment cannot silently drop a
 // capability when it moves tools out of the control image.
+//
+// CountScope and OfficialToolSurface are deliberately emitted alongside the
+// numeric counts. The upstream README uses the broader product wording
+// "100+ curated tools", while Total/Enabled/Disabled are exact counts of the
+// YAML definitions in this checkout and must not be presented as the full
+// runtime tool surface.
 type ToolInventory struct {
-	SchemaVersion int             `yaml:"schema_version"`
-	Source        string          `yaml:"source"`
-	Total         int             `yaml:"total"`
-	Enabled       int             `yaml:"enabled"`
-	Disabled      int             `yaml:"disabled"`
-	Tools         []InventoryTool `yaml:"tools"`
+	SchemaVersion       int             `yaml:"schema_version"`
+	Source              string          `yaml:"source"`
+	CountScope          string          `yaml:"count_scope"`
+	OfficialToolSurface string          `yaml:"official_tool_surface"`
+	Total               int             `yaml:"total"`
+	Enabled             int             `yaml:"enabled"`
+	Disabled            int             `yaml:"disabled"`
+	Tools               []InventoryTool `yaml:"tools"`
 }
 
 type InventoryTool struct {
@@ -208,10 +216,12 @@ func BuildInventoryWithRuntime(toolsDir string, catalog Catalog, runtimeManifest
 	sort.Slice(inventoryTools, func(i, j int) bool { return inventoryTools[i].ID < inventoryTools[j].ID })
 
 	inventory := ToolInventory{
-		SchemaVersion: 1,
-		Source:        filepath.ToSlash(filepath.Clean(toolsDir)),
-		Total:         len(inventoryTools),
-		Tools:         inventoryTools,
+		SchemaVersion:       1,
+		Source:              filepath.ToSlash(filepath.Clean(toolsDir)),
+		CountScope:          "tools/*.yaml definitions",
+		OfficialToolSurface: "100+",
+		Total:               len(inventoryTools),
+		Tools:               inventoryTools,
 	}
 	for _, entry := range inventoryTools {
 		if entry.Enabled {

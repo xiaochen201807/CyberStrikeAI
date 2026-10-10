@@ -30,8 +30,10 @@ services:
       - control-agents:/app/agents
       - control-agents:/app/config/agents
       - control-knowledge:/app/knowledge_base
-      # The repository's 90 tool definitions remain available to the
-      # application.  This is a registry mount, not a scanner binary bundle.
+      # The tracked YAML definitions remain available to the application.
+      # inventory.yaml records their exact count separately from the upstream
+      # 100+ product-surface wording. This is a registry mount, not a scanner
+      # binary bundle.
       # Set CYBERSTRIKE_TOOLS_DIR to a managed/custom registry when deploying
       # outside this checkout.
       - ${CYBERSTRIKE_TOOLS_DIR:-../../tools}:/app/tools:ro

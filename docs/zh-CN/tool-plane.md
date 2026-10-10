@@ -5,7 +5,9 @@ CyberStrikeAI 的 Web/API 控制平面和安全工具平面应分开部署。控
 sqlmap 等扫描器二进制塞进控制镜像；二进制由 `deploy/tools/docker-compose.yml`、
 `deploy/tools/docker-compose.runtime.yml` 或受管主机运行时提供。
 
-当前仓库工具清单以 `tools/*.yaml` 为准，共 90 个定义，其中 78 个启用、12 个禁用。完整
+官方产品口径是 100+ 个精选工具；本检出版本可精确核对到 90 个 `tools/*.yaml` 定义，其中 78 个启用、12 个禁用。
+这两个数字统计范围不同：`inventory.yaml` 的 `total`、`enabled`、`disabled` 只统计 YAML 定义，
+不代表完整平台工具面；内置工具、外部 MCP 联邦和自定义扩展另计。完整
 部署状态见 [`deploy/tools/inventory.yaml`](../../deploy/tools/inventory.yaml)。73 个可迁移工具已经
 映射到 8 个独立工具族镜像；3 个控制平面 Shell/Python 能力由控制面镜像提供；Nuclei/ZAP 仍使用
 固定的专用适配器；1 个内部工具不会迁移到外部运行时。镜像构建阶段会对每个族执行严格

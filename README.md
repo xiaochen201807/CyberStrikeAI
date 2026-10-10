@@ -116,7 +116,7 @@ CyberStrikeAI connects planning, execution, human oversight, evidence, and repla
 
 ### Tools and knowledge
 
-- 🧰 **Security tools** include 90 curated YAML recipes with custom extensions and role-scoped access.
+- 🧰 **Security tools** include the upstream-described 100+ curated tool surface, with YAML recipes, custom extensions, and role-scoped access.
 - 🔌 **MCP integration** supports HTTP, stdio, SSE, external federation, and dynamic tool discovery.
 - ⏱️ **Resilient tool execution** runs blocking MCP/tool calls in workers with bounded agent waits, resumable `execution_id` polling, cancellation, per-server circuit breakers, concurrency limits, and unified output caps.
 - 🎯 **Agent Skills** follow the standard Skill layout and support progressive, on-demand loading.
@@ -162,7 +162,7 @@ CyberStrikeAI includes optional integrations under `plugins/`.
 
 ## Tool Overview
 
-CyberStrikeAI currently ships with 90 curated tool definitions covering the whole kill chain:
+CyberStrikeAI's upstream product documentation describes 100+ curated tools covering the whole kill chain. This checkout currently tracks 90 exact `tools/*.yaml` definitions; the product surface also includes built-in, federated, and custom extensions:
 
 <details>
 <summary><strong>View the complete tool categories</strong></summary>
@@ -232,7 +232,7 @@ The `run.sh` script will automatically:
      ```
    - Or edit `config.yaml` directly before launching. `ai.default_channel` is used for new conversations and tasks that do not explicitly select a channel; the chat page can also select any saved channel per session.
 2. **Login** - On first startup the console prints an auto-generated initial `admin` password; create accounts from **Platform permissions → User management**
-3. **Prepare security tools** - The control plane keeps all 90 `tools/*.yaml` definitions and their schemas. The independent [Docker tool plane](docs/zh-CN/tool-plane.md) now provides fixed Nuclei/ZAP adapters plus eight independently built family runtimes; each family image runs a strict command check during its build. Control-plane shell helpers and disabled definitions remain outside scanner images.
+3. **Prepare security tools** - The control plane keeps all tracked `tools/*.yaml` definitions and their schemas. The independent [Docker tool plane](docs/zh-CN/tool-plane.md) now provides fixed Nuclei/ZAP adapters plus eight independently built family runtimes; each family image runs a strict command check during its build. Control-plane shell helpers and disabled definitions remain outside scanner images. `deploy/tools/inventory.yaml` labels its exact YAML count separately from the upstream 100+ product-surface wording.
 
    **macOS (Homebrew):**
    ```bash
@@ -338,7 +338,7 @@ CyberStrikeAI/
 ├── cmd/                 # Server, MCP stdio entrypoints, tooling
 ├── internal/            # Agent, MCP core, handlers, C2 (`internal/c2`), security executor
 ├── web/                 # Static SPA + templates
-├── tools/               # YAML tool recipes (90 definitions currently provided)
+├── tools/               # YAML tool recipes (90 exact definitions tracked here; upstream product surface is 100+)
 ├── roles/               # Role configurations (12+ predefined security testing roles)
 ├── skills/              # Agent Skills dirs (SKILL.md + optional files; demo: cyberstrike-eino-demo)
 ├── agents/              # Multi-agent Markdown (orchestrator.md + sub-agent *.md)

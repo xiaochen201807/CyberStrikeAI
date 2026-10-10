@@ -43,7 +43,8 @@ Use multi-line text and include:
 - If `short_description` is missing, the system uses the first line or first 100 characters of `description`.
 - Full descriptions are available via MCP `resources/read` (URI: `tool://tool_name`).
 
-This reduces token usage, especially with many tools (the repository currently ships 90 definitions).
+This reduces token usage, especially with many tools. The upstream product wording is 100+ curated tools;
+the exact `tools/*.yaml` definition count is tracked separately in `deploy/tools/inventory.yaml`.
 
 ## Parameter Definition
 

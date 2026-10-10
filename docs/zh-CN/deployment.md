@@ -11,7 +11,7 @@
 - Go：用于源码运行或构建二进制。
 - Python：部分 MCP 服务或工具脚本需要 Python 运行环境。
 - SQLite：默认使用文件型数据库，无需单独服务。
-- 安全工具：`tools/` 中的 90 个 YAML 是 Agent 命令定义，会随控制平面加载；推荐使用 `deploy/tools/` 中的独立 Compose 工具平面逐步提供扫描器二进制。目前 Nuclei/ZAP 已有适配器，其余命令需在受管运行时安装或按 `inventory.yaml` 迁移。
+- 安全工具：官方产品口径为 100+；本检出版本的 `tools/` 中可精确核对到 90 个 YAML Agent 命令定义，会随控制平面加载。推荐使用 `deploy/tools/` 中的独立 Compose 工具平面逐步提供扫描器二进制。目前 Nuclei/ZAP 已有适配器，其余命令需在受管运行时安装或按 `inventory.yaml` 迁移。
 - 模型服务：至少配置一个 `ai.channels` 通道；`provider: openai_compatible` 适用于 OpenAI 兼容 API，`provider: claude` 使用 Eino 原生 Claude 组件。
 
 建议目录：

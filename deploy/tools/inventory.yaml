@@ -1,5 +1,7 @@
 schema_version: 1
 source: tools
+count_scope: tools/*.yaml definitions
+official_tool_surface: 100+
 total: 90
 enabled: 78
 disabled: 12

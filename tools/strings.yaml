@@ -1,6 +1,9 @@
 name: "strings"
 command: "strings"
 enabled: true
+deployment:
+  family: binary-forensics
+  runtime: family
 short_description: "从二进制文件中提取字符串"
 description: |
   Strings工具用于从二进制文件中提取可打印字符串。

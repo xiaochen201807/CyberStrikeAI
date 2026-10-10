@@ -1,6 +1,9 @@
 name: "prowler"
 command: "prowler"
 enabled: true
+deployment:
+  family: cloud
+  runtime: family
 short_description: "云安全评估工具（AWS, Azure, GCP）"
 description: |
   Prowler是一个全面的云安全评估工具，支持AWS、Azure和GCP。

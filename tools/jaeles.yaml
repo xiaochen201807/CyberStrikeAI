@@ -2,6 +2,9 @@ name: "jaeles"
 command: "jaeles"
 args: ["scan"]
 enabled: true
+deployment:
+  family: web
+  runtime: family
 short_description: "高级漏洞扫描器，支持自定义签名"
 description: |
   Jaeles是一个高级漏洞扫描器，支持自定义签名进行漏洞检测。

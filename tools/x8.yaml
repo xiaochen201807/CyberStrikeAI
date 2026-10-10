@@ -1,6 +1,9 @@
 name: "x8"
 command: "x8"
 enabled: true
+deployment:
+  family: web
+  runtime: family
 short_description: "隐藏参数发现工具"
 description: |
   X8是一个用于发现Web应用中隐藏参数的工具。

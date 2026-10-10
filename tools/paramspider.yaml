@@ -1,6 +1,9 @@
 name: "paramspider"
 command: "paramspider"
 enabled: true
+deployment:
+  family: web
+  runtime: family
 short_description: "从Web档案中挖掘参数"
 description: |
   ParamSpider从Web档案中挖掘参数，用于发现隐藏的参数。

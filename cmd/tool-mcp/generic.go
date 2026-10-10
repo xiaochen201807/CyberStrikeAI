@@ -68,7 +68,11 @@ func selectTools(catalog toolcatalog.Catalog) ([]selectedTool, bool, error) {
 	if family != "" {
 		family = strings.ToLower(family)
 		for _, definition := range definitions {
-			if definition.Enabled && toolcatalog.ClassifyToolFamily(definition.Name, definition.Command) == family {
+			deployment, deploymentErr := toolcatalog.ResolveToolDeployment(definition)
+			if deploymentErr != nil {
+				return nil, true, deploymentErr
+			}
+			if definition.Enabled && deployment.Family == family && deployment.Runtime == toolcatalog.DeploymentRuntimeFamily {
 				ids = append(ids, definition.Name)
 			}
 		}

@@ -34,6 +34,9 @@ args:
 
     subprocess.run(cmd, check=False)
 enabled: true
+deployment:
+  family: exploitation
+  runtime: family
 short_description: "Metasploit渗透测试框架"
 description: |
   通过 `msfconsole -q -x` 非交互执行模块。可提供JSON格式的模块选项，脚本自动构建 `set` 与 `run` 指令。

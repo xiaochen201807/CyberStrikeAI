@@ -1,6 +1,9 @@
 name: "fierce"
 command: "fierce"
 enabled: true
+deployment:
+  family: recon
+  runtime: family
 short_description: "DNS侦察工具"
 description: |
   Fierce是一个DNS侦察工具，用于发现目标域名的子域名。

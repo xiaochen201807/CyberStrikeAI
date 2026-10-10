@@ -1,6 +1,9 @@
 name: "arp-scan"
 command: "arp-scan"
 enabled: true
+deployment:
+  family: recon
+  runtime: family
 short_description: "ARP网络发现工具"
 description: |
   Arp-scan是一个ARP网络发现工具，用于发现本地网络中的活动主机。

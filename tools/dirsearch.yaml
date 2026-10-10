@@ -1,6 +1,9 @@
 name: "dirsearch"
 command: "dirsearch"
 enabled: true
+deployment:
+  family: web
+  runtime: family
 short_description: "高级目录和文件发现工具"
 description: |
   Dirsearch是一个高级Web内容扫描器，用于发现目录和文件。

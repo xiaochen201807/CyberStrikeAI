@@ -1,6 +1,9 @@
 name: "foremost"
 command: "foremost"
 enabled: true
+deployment:
+  family: binary-forensics
+  runtime: family
 short_description: "文件恢复工具"
 description: |
   Foremost是一个基于文件头和尾的文件恢复工具。

@@ -127,8 +127,8 @@ func TestGenericCommandRejectsShellDefinitions(t *testing.T) {
 func TestSelectToolsByRepositoryFamily(t *testing.T) {
 	root := t.TempDir()
 	definitions := []string{
-		"name: nmap\ncommand: nmap\nenabled: true\ndescription: recon\n",
-		"name: sqlmap\ncommand: sqlmap\nenabled: true\ndescription: web\n",
+		"name: nmap\ncommand: nmap\nenabled: true\ndeployment:\n  family: recon\n  runtime: family\ndescription: recon\n",
+		"name: sqlmap\ncommand: sqlmap\nenabled: true\ndeployment:\n  family: web\n  runtime: family\ndescription: web\n",
 	}
 	for _, content := range definitions {
 		name := strings.SplitN(strings.SplitN(content, "\n", 2)[0], ": ", 2)[1]

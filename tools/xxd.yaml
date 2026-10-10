@@ -1,6 +1,9 @@
 name: "xxd"
 command: "xxd"
 enabled: true
+deployment:
+  family: binary-forensics
+  runtime: family
 short_description: "十六进制转储工具"
 description: |
   Xxd是一个十六进制转储工具，用于以十六进制格式显示文件内容。

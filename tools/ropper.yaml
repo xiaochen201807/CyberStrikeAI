@@ -1,6 +1,9 @@
 name: "ropper"
 command: "ropper"
 enabled: true
+deployment:
+  family: binary-forensics
+  runtime: family
 short_description: "高级ROP/JOP gadget搜索工具"
 description: |
   Ropper是一个高级ROP/JOP gadget搜索工具，用于漏洞利用开发。

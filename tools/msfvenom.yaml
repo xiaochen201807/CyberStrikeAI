@@ -1,6 +1,9 @@
 name: "msfvenom"
 command: "msfvenom"
 enabled: true
+deployment:
+  family: exploitation
+  runtime: family
 short_description: "Metasploit载荷生成工具"
 description: |
   MSFVenom是Metasploit框架的载荷生成工具，用于创建各种类型的攻击载荷。

@@ -1,6 +1,9 @@
 name: "hashpump"
 command: "hashpump"
 enabled: true
+deployment:
+  family: binary-forensics
+  runtime: family
 short_description: "哈希长度扩展攻击工具"
 description: |
   HashPump是一个用于执行哈希长度扩展攻击的工具。

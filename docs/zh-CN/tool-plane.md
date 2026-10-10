@@ -50,6 +50,19 @@ go run ./cmd/toolcatalog validate --compose deploy/tools/docker-compose.yml depl
 进行严格校验。CI/生产环境可以增加 `--require-digests`，禁止只使用版本标签。
 其中 `profile` 表示逻辑工具族，`compose_profile` 将长驻 MCP 和一次性任务分开。
 
+工具定义本身现在还必须包含显式的 `deployment` 元数据：
+
+```yaml
+deployment:
+  family: recon
+  runtime: family
+```
+
+`family` 描述能力域，`runtime` 描述交付方式。工具平面只接受 `family`、
+`external-adapter`、`control-image`、`builtin` 和 `disabled` 这几种运行时状态；固定适配器还必须
+声明 `adapter`。清单生成、族 MCP 选择和镜像构建共用这组字段，新增工具缺少声明时 CI 会失败，
+不会再依据工具文件名进行隐式分类。
+
 ## 三个 Compose 文件
 
 ```bash

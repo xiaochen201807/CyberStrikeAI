@@ -1,6 +1,9 @@
 name: "masscan"
 command: "masscan"
 enabled: true
+deployment:
+  family: recon
+  runtime: family
 short_description: "高速互联网级端口扫描工具"
 description: |
   Masscan是一个高速端口扫描工具，可以在几分钟内扫描整个互联网。

@@ -1,6 +1,9 @@
 name: "dnsenum"
 command: "dnsenum"
 enabled: true
+deployment:
+  family: recon
+  runtime: family
 short_description: "DNS枚举工具"
 description: |
   DNSenum是一个DNS信息收集工具，用于枚举DNS信息。

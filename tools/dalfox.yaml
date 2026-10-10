@@ -4,6 +4,9 @@ command: "dalfox"
 args:
   - "url"
 enabled: true
+deployment:
+  family: web
+  runtime: family
 short_description: "高级XSS漏洞扫描器"
 description: |
   Dalfox是一个高级XSS漏洞扫描器，支持多种XSS检测技术。

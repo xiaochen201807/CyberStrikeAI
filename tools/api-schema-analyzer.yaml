@@ -2,6 +2,9 @@ name: "api-schema-analyzer"
 command: "spectral"
 args: ["lint"]
 enabled: true
+deployment:
+  family: utility
+  runtime: family
 short_description: "API模式分析工具，识别潜在安全问题"
 description: |
   调用 `spectral lint` 对 OpenAPI/Swagger/GraphQL 模式进行静态分析，可结合自定义规则集或输出格式。

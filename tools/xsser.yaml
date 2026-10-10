@@ -1,6 +1,9 @@
 name: "xsser"
 command: "xsser"
 enabled: true
+deployment:
+  family: web
+  runtime: family
 short_description: "XSS漏洞测试工具"
 description: |
   XSSer是一个自动化XSS漏洞测试工具。

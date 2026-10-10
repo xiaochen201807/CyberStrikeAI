@@ -18,6 +18,7 @@
 | `args` | 可选 | string[] | 固定参数，按顺序 prepend 到命令行，常用于定义默认扫描模式。 |
 | `parameters` | 可选 | array | 运行时可配置参数列表，详见「参数定义」章节。 |
 | `arg_mapping` | 可选 | string | 参数映射模式（`auto`/`manual`/`template`），默认 `auto`；除非有特殊需求，无需填写。 |
+| `deployment` | 工具平面必填 | object | 工具族、运行时类型和固定适配器声明；由清单生成和镜像构建校验。 |
 
 > 若某字段填写错误或漏填必填项，系统会在加载时跳过该工具并在日志中输出警告，但不会影响其他工具。
 
@@ -45,6 +46,43 @@
 
 这样可以大幅减少token消耗，特别是当工具数量很多时（如100个工具）。
 
+### 部署元数据 (`deployment`)
+
+工具平面不再根据工具名称猜测镜像归属。每个工具定义都必须声明部署元数据：
+
+```yaml
+deployment:
+  family: recon
+  runtime: family
+```
+
+`family` 可取 `recon`、`web`、`identity`、`binary-forensics`、`cloud`、
+`exploitation`、`external-intel`、`utility` 或 `control`。
+
+`runtime` 可取：
+
+- `family`：由对应的独立工具族镜像提供命令；
+- `external-adapter`：由固定工具平面适配器提供，必须同时填写 `adapter`，例如
+  `adapter: nuclei_scan`；
+- `control-image`：由控制平面镜像提供；
+- `builtin`：由控制平面内部实现，通常对应 `internal:*` 命令；
+- `disabled`：保留定义但当前不进入可执行运行时。
+
+示例：
+
+```yaml
+name: nuclei
+command: nuclei
+enabled: true
+deployment:
+  family: web
+  runtime: external-adapter
+  adapter: nuclei_scan
+```
+
+清单生成、按族选择 MCP 工具和镜像构建都会读取这组字段。新增工具如果缺少元数据、声明不存在的族，
+或引用未启用的适配器，CI 会直接失败；不会再根据文件名自动落入某个族。
+
 ## Docker 部署兼容性
 
 `tools/*.yaml` 是 CyberStrikeAI 当前工具注册表的事实来源。Docker 控制平面会加载完整目录，
@@ -53,15 +91,17 @@
 
 - `family`：由 `deploy/tools/runtime/` 构建的独立工具族镜像提供，镜像内包含该族全部启用命令。
 - `external-adapter`：已经有独立工具平面适配器，并保留原 YAML 定义作为兼容注册。
-- `native`：仅保留给控制平面能力或尚未迁移的定义，需要在受管运行时安装对应命令。
+- `control-image`：由控制平面镜像提供的 Shell/Python 能力。
 - `builtin`：由控制平面内部实现，不能作为普通外部命令迁移。
+- `disabled`：当前不进入可执行运行时，但保留注册表定义。
 
 `availability: enabled` 只表示定义启用；实际二进制状态看 `binary_status`。`runtime-declared` 表示
 已经有族镜像配方，族镜像构建阶段会用 `toolcatalog doctor --strict` 验收；`adapter-ready` 和
 `builtin` 表示已有固定适配器或控制平面内置实现。
 
-新增工具时先添加 YAML 定义，再把它归入一个运行时族并补充安装配方，随后运行 `toolcatalog inventory`
-更新部署清单。没有镜像、参数适配器、目标边界和结果回写契约时，不要把工具标记为已容器化。
+新增工具时先添加 YAML 定义和 `deployment` 元数据，再补充对应族的安装配方或固定适配器，随后运行
+`toolcatalog inventory` 更新部署清单。没有镜像、参数适配器、目标边界和结果回写契约时，不要把工具
+标记为已容器化。
 
 ## 参数定义
 

@@ -1,6 +1,9 @@
 name: "jwt-analyzer"
 command: "jwt_tool"
 enabled: true
+deployment:
+  family: web
+  runtime: family
 short_description: "JWT令牌分析和漏洞测试工具"
 description: |
   高级JWT令牌分析和漏洞测试工具，用于检测JWT实现中的安全问题。

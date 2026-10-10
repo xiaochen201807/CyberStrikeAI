@@ -1,6 +1,9 @@
 name: "trivy"
 command: "trivy"
 enabled: true
+deployment:
+  family: cloud
+  runtime: family
 short_description: "容器和文件系统漏洞扫描器"
 description: |
   Trivy是一个简单而全面的容器和文件系统漏洞扫描器。

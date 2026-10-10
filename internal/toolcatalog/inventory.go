@@ -42,7 +42,7 @@ type InventoryTool struct {
 	Enabled        bool   `yaml:"enabled"`
 	Layer          string `yaml:"layer"`   // control | tool-plane
 	Family         string `yaml:"family"`  // logical capability group
-	Runtime        string `yaml:"runtime"` // builtin | native | external-adapter
+	Runtime        string `yaml:"runtime"` // family | external-adapter | control-image | builtin | disabled
 	Containerized  bool   `yaml:"containerized"`
 	Adapter        string `yaml:"adapter,omitempty"` // deployment catalog id, if one exists
 	RuntimeImage   string `yaml:"runtime_image,omitempty"`
@@ -69,6 +69,70 @@ type RuntimeFamily struct {
 	Service        string `yaml:"service"`
 	ComposeProfile string `yaml:"compose_profile"`
 	Image          string `yaml:"image"`
+}
+
+const (
+	DeploymentRuntimeFamily          = "family"
+	DeploymentRuntimeExternalAdapter = "external-adapter"
+	DeploymentRuntimeControlImage    = "control-image"
+	DeploymentRuntimeBuiltin         = "builtin"
+	DeploymentRuntimeDisabled        = "disabled"
+)
+
+var deploymentFamilies = map[string]struct{}{
+	"control":          {},
+	"recon":            {},
+	"web":              {},
+	"identity":         {},
+	"binary-forensics": {},
+	"cloud":            {},
+	"exploitation":     {},
+	"external-intel":   {},
+	"utility":          {},
+}
+
+// ResolveToolDeployment validates and returns the explicit deployment
+// metadata carried by a tools/*.yaml definition.  The tool plane must not
+// infer a family from a name: a new or renamed tool has to declare its
+// deployment contract before it can be selected by a runtime image.
+func ResolveToolDeployment(tool config.ToolConfig) (config.ToolDeploymentConfig, error) {
+	if tool.Deployment == nil {
+		return config.ToolDeploymentConfig{}, fmt.Errorf("tool %q is missing deployment metadata", tool.Name)
+	}
+	deployment := *tool.Deployment
+	deployment.Family = strings.ToLower(strings.TrimSpace(deployment.Family))
+	deployment.Runtime = strings.ToLower(strings.TrimSpace(deployment.Runtime))
+	deployment.Adapter = strings.TrimSpace(deployment.Adapter)
+	if _, ok := deploymentFamilies[deployment.Family]; !ok {
+		return config.ToolDeploymentConfig{}, fmt.Errorf("tool %q declares unsupported deployment family %q", tool.Name, deployment.Family)
+	}
+	switch deployment.Runtime {
+	case DeploymentRuntimeFamily, DeploymentRuntimeExternalAdapter, DeploymentRuntimeControlImage, DeploymentRuntimeBuiltin, DeploymentRuntimeDisabled:
+	default:
+		return config.ToolDeploymentConfig{}, fmt.Errorf("tool %q declares unsupported deployment runtime %q", tool.Name, deployment.Runtime)
+	}
+	if deployment.Runtime == DeploymentRuntimeExternalAdapter && deployment.Adapter == "" {
+		return config.ToolDeploymentConfig{}, fmt.Errorf("tool %q uses external-adapter runtime without adapter", tool.Name)
+	}
+	if deployment.Runtime != DeploymentRuntimeExternalAdapter && deployment.Adapter != "" {
+		return config.ToolDeploymentConfig{}, fmt.Errorf("tool %q declares adapter %q for runtime %q", tool.Name, deployment.Adapter, deployment.Runtime)
+	}
+	if tool.Enabled && deployment.Runtime == DeploymentRuntimeDisabled {
+		return config.ToolDeploymentConfig{}, fmt.Errorf("enabled tool %q cannot use disabled deployment runtime", tool.Name)
+	}
+	if deployment.Family == "control" && deployment.Runtime == DeploymentRuntimeFamily {
+		return config.ToolDeploymentConfig{}, fmt.Errorf("control-plane tool %q cannot use family runtime", tool.Name)
+	}
+	if deployment.Family != "control" && (deployment.Runtime == DeploymentRuntimeControlImage || deployment.Runtime == DeploymentRuntimeBuiltin) {
+		return config.ToolDeploymentConfig{}, fmt.Errorf("non-control tool %q cannot use %q runtime", tool.Name, deployment.Runtime)
+	}
+	if strings.HasPrefix(strings.TrimSpace(tool.Command), "internal:") && deployment.Runtime != DeploymentRuntimeBuiltin {
+		return config.ToolDeploymentConfig{}, fmt.Errorf("internal tool %q must use builtin deployment runtime", tool.Name)
+	}
+	if deployment.Runtime == DeploymentRuntimeBuiltin && !strings.HasPrefix(strings.TrimSpace(tool.Command), "internal:") {
+		return config.ToolDeploymentConfig{}, fmt.Errorf("builtin tool %q must use an internal command", tool.Name)
+	}
+	return deployment, nil
 }
 
 func LoadRuntimeManifest(path string) (RuntimeManifest, error) {
@@ -143,13 +207,13 @@ func BuildInventoryWithRuntime(toolsDir string, catalog Catalog, runtimeManifest
 		return ToolInventory{}, fmt.Errorf("no tool definitions found in %q", toolsDir)
 	}
 
-	adapterBySource := map[string]string{
-		"nuclei": "nuclei_scan",
-		"zap":    "zap_baseline",
-	}
 	inventoryTools := make([]InventoryTool, 0, len(loaded))
 	for _, loadedTool := range loaded {
 		tool := loadedTool.tool
+		deployment, deploymentErr := ResolveToolDeployment(tool)
+		if deploymentErr != nil {
+			return ToolInventory{}, fmt.Errorf("load deployment metadata for %s: %w", loadedTool.source, deploymentErr)
+		}
 		entry := InventoryTool{
 			ID:           tool.Name,
 			Source:       loadedTool.source,
@@ -159,14 +223,14 @@ func BuildInventoryWithRuntime(toolsDir string, catalog Catalog, runtimeManifest
 			BinaryStatus: "disabled",
 			Migration:    "preserved",
 			Layer:        "control",
-			Runtime:      "native",
-			Family:       ClassifyToolFamily(tool.Name, tool.Command),
+			Runtime:      deployment.Runtime,
+			Family:       deployment.Family,
 		}
 		if tool.Enabled {
 			entry.Availability = "enabled"
 			entry.BinaryStatus = "unverified"
 		}
-		if strings.HasPrefix(strings.TrimSpace(tool.Command), "internal:") {
+		if deployment.Runtime == DeploymentRuntimeBuiltin {
 			entry.Layer = "control"
 			entry.Runtime = "builtin"
 			entry.Availability = "builtin"
@@ -175,7 +239,7 @@ func BuildInventoryWithRuntime(toolsDir string, catalog Catalog, runtimeManifest
 			entry.Migration = "preserved"
 			entry.Notes = "由 CyberStrikeAI 控制平面内部实现，不能迁移为外部命令容器。"
 		}
-		if adapter := adapterBySource[tool.Name]; adapter != "" {
+		if adapter := deployment.Adapter; adapter != "" {
 			if adapterTool, ok := catalog.Tool(adapter); ok && adapterTool.Enabled {
 				entry.Layer = "tool-plane"
 				entry.Runtime = "external-adapter"
@@ -186,12 +250,14 @@ func BuildInventoryWithRuntime(toolsDir string, catalog Catalog, runtimeManifest
 					entry.BinaryStatus = "adapter-ready"
 				}
 				entry.Notes = "已有独立工具平面适配器；工具 YAML 仍保留，保证原有名称和参数兼容。"
+			} else {
+				return ToolInventory{}, fmt.Errorf("tool %q references missing or disabled adapter %q", tool.Name, adapter)
 			}
 		}
 		// Shell/Python helpers are intentionally control-plane capabilities, not
 		// scanner-family commands.  The control Dockerfile installs and checks
 		// their interpreters, so record that executable runtime explicitly.
-		if entry.Enabled && entry.Family == "control" && entry.Runtime == "native" {
+		if entry.Enabled && deployment.Runtime == DeploymentRuntimeControlImage {
 			entry.Containerized = true
 			entry.RuntimeImage = "cyberstrike-ai:control"
 			entry.RuntimeService = "cyberstrike-ai"
@@ -199,7 +265,7 @@ func BuildInventoryWithRuntime(toolsDir string, catalog Catalog, runtimeManifest
 			entry.Migration = "preserved"
 			entry.Notes = "由控制平面镜像提供 sh、bash、python3 和 venv 运行时；不迁移到扫描器族镜像。"
 		}
-		if !entry.Containerized && entry.Enabled && entry.Runtime != "builtin" && len(runtimeManifest.Families) > 0 {
+		if !entry.Containerized && entry.Enabled && deployment.Runtime == DeploymentRuntimeFamily && len(runtimeManifest.Families) > 0 {
 			if runtime, ok := runtimeManifest.Families[entry.Family]; ok {
 				entry.Layer = "tool-plane"
 				entry.Runtime = "family"
@@ -209,6 +275,8 @@ func BuildInventoryWithRuntime(toolsDir string, catalog Catalog, runtimeManifest
 				entry.BinaryStatus = "runtime-declared"
 				entry.Migration = "runtime-declared"
 				entry.Notes = "由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。"
+			} else {
+				return ToolInventory{}, fmt.Errorf("tool %q declares family runtime %q without a runtime manifest entry", tool.Name, entry.Family)
 			}
 		}
 		inventoryTools = append(inventoryTools, entry)
@@ -237,42 +305,4 @@ func BuildInventoryWithRuntime(toolsDir string, catalog Catalog, runtimeManifest
 // inventory changes when tools/*.yaml is added, removed or disabled.
 func MarshalInventory(inventory ToolInventory) ([]byte, error) {
 	return yaml.Marshal(inventory)
-}
-
-// ClassifyToolFamily maps the repository's stable tool IDs to the deployment
-// families used by the compatibility adapter. The mapping is based on the
-// existing YAML names rather than image contents, so a family can be selected
-// before its runtime image is built and verified.
-func ClassifyToolFamily(id, command string) string {
-	id = strings.ToLower(strings.TrimSpace(id))
-	command = strings.ToLower(strings.TrimSpace(command))
-	switch {
-	case id == "exec" || id == "execute-python-script" || id == "install-python-package" || strings.HasPrefix(command, "internal:"):
-		return "control"
-	case containsAny(id, "cloud", "checkov", "prowler", "scout", "pacu", "terrascan", "trivy", "kube", "falco", "clair"):
-		return "cloud"
-	case containsAny(id, "bloodhound", "enum4linux", "impacket", "netexec", "rpcclient", "smbmap", "responder", "hydra"):
-		return "identity"
-	case containsAny(id, "linpeas", "metasploit", "msfvenom"):
-		return "exploitation"
-	case containsAny(id, "binwalk", "checksec", "gdb", "ghidra", "objdump", "one-gadget", "pwntools", "pwninit", "radare", "rop", "steghide", "strings", "volatility", "xxd", "zsteg", "hash", "john", "angr", "foremost", "exiftool"):
-		return "binary-forensics"
-	case containsAny(id, "sqlmap", "nikto", "ffuf", "gobuster", "ferox", "dirsearch", "dalfox", "jaeles", "nuclei", "wafw00f", "xsser", "arjun", "paramspider", "graphql", "wpscan", "x8", "zap", "dotdotpwn", "jwt", "http-framework"):
-		return "web"
-	case containsAny(id, "fofa", "quake", "shodan", "virustotal", "zoomeye", "dnslog"):
-		return "external-intel"
-	case containsAny(id, "amass", "arp", "dnsenum", "fierce", "gau", "katana", "masscan", "nbtscan", "nmap", "rustscan", "subfinder", "wayback", "fscan"):
-		return "recon"
-	default:
-		return "utility"
-	}
-}
-
-func containsAny(value string, words ...string) bool {
-	for _, word := range words {
-		if strings.Contains(value, word) {
-			return true
-		}
-	}
-	return false
 }

@@ -1,6 +1,9 @@
 name: "ghidra"
 command: "analyzeHeadless"
 enabled: true
+deployment:
+  family: binary-forensics
+  runtime: family
 short_description: "高级二进制分析和逆向工程工具"
 description: |
   Ghidra是NSA开发的免费二进制分析和逆向工程工具。

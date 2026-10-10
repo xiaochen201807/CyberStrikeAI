@@ -1,6 +1,9 @@
 name: "sqlmap"
 command: "sqlmap"
 enabled: true
+deployment:
+  family: web
+  runtime: family
 # 简短描述（用于工具列表，减少token消耗）
 short_description: "自动化SQL注入检测和利用工具，用于发现和利用SQL注入漏洞"
 # 工具详细描述

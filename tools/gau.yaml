@@ -1,6 +1,9 @@
 name: "gau"
 command: "gau"
 enabled: true
+deployment:
+  family: recon
+  runtime: family
 short_description: "从多个数据源获取所有URL"
 description: |
   Gau (Get All URLs) 从多个数据源获取目标域名的所有URL。

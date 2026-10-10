@@ -1,6 +1,9 @@
 name: "linpeas"
 command: "linpeas.sh"
 enabled: true
+deployment:
+  family: exploitation
+  runtime: family
 short_description: "Linux 权限提升枚举脚本，自动检测常见提权路径"
 description: |
   LinPEAS (Linux Privilege Escalation Awesome Script) 是一个自动化权限提升枚举脚本，用于检测 Linux 系统中的常见提权路径。

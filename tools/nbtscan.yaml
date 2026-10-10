@@ -1,6 +1,9 @@
 name: "nbtscan"
 command: "nbtscan"
 enabled: true
+deployment:
+  family: recon
+  runtime: family
 short_description: "NetBIOS名称扫描工具"
 description: |
   Nbtscan是一个NetBIOS名称扫描工具，用于发现网络中的Windows系统。

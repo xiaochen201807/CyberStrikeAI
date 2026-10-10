@@ -1,6 +1,9 @@
 name: "kube-bench"
 command: "kube-bench"
 enabled: true
+deployment:
+  family: cloud
+  runtime: family
 short_description: "CIS Kubernetes基准检查工具"
 description: |
   Kube-bench是一个CIS Kubernetes基准检查工具，用于检查Kubernetes集群是否符合CIS基准。

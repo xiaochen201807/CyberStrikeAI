@@ -1,6 +1,9 @@
 name: "smbmap"
 command: "smbmap"
 enabled: true
+deployment:
+  family: identity
+  runtime: family
 short_description: "SMB共享枚举和访问工具"
 description: |
   SMBMap是一个用于枚举SMB共享并提供文件访问功能的工具。

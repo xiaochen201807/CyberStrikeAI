@@ -1,6 +1,9 @@
 name: "amass"
 command: "amass"
 enabled: true
+deployment:
+  family: recon
+  runtime: family
 short_description: "子域名枚举和网络映射工具"
 description: |
   Amass是一个深度子域名枚举和网络映射工具，通过多种技术发现目标域名的子域名。

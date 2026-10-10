@@ -1,6 +1,9 @@
 name: "one-gadget"
 command: "one_gadget"
 enabled: true
+deployment:
+  family: binary-forensics
+  runtime: family
 short_description: "在libc中查找one-shot RCE gadget的工具"
 description: |
   One-gadget是一个用于在libc中查找one-shot RCE gadget的工具。

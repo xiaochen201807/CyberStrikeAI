@@ -1,6 +1,9 @@
 name: "netexec"
 command: "netexec"
 enabled: true
+deployment:
+  family: identity
+  runtime: family
 short_description: "网络枚举和利用框架（原CrackMapExec）"
 description: |
   NetExec（原CrackMapExec）是一个网络枚举和利用框架，支持多种协议。

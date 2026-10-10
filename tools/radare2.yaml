@@ -1,6 +1,9 @@
 name: "radare2"
 command: "r2"
 enabled: true
+deployment:
+  family: binary-forensics
+  runtime: family
 short_description: "二进制分析和逆向工程框架，支持反汇编、调试和脚本分析"
 description: |
   Radare2是一个完整的二进制分析和逆向工程框架，支持多种架构和文件格式。

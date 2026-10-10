@@ -1,6 +1,9 @@
 name: "scout-suite"
 command: "scout"
 enabled: true
+deployment:
+  family: cloud
+  runtime: family
 short_description: "多云安全评估工具"
 description: |
   Scout Suite是一个多云安全评估工具，支持AWS、Azure、GCP、Aliyun和OCI。

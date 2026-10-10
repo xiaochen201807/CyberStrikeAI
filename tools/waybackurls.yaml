@@ -1,6 +1,9 @@
 name: "waybackurls"
 command: "waybackurls"
 enabled: true
+deployment:
+  family: recon
+  runtime: family
 short_description: "从Wayback Machine获取历史URL"
 description: |
   Waybackurls从Wayback Machine获取目标域名的历史URL。

@@ -1,6 +1,9 @@
 name: "gdb"
 command: "gdb"
 enabled: true
+deployment:
+  family: binary-forensics
+  runtime: family
 short_description: "GNU调试器，用于二进制分析和调试"
 description: |
   GDB是GNU调试器，用于调试和分析二进制程序。

@@ -12,7 +12,7 @@ func TestBuildInventoryPreservesAllToolDefinitions(t *testing.T) {
 	if err := os.MkdirAll(toolsDir, 0755); err != nil {
 		t.Fatal(err)
 	}
-	write := func(name, command string, enabled bool) {
+	write := func(name, command string, enabled bool, family, runtime string) {
 		t.Helper()
 		content := "name: " + name + "\ncommand: " + command + "\nenabled: "
 		if enabled {
@@ -20,14 +20,14 @@ func TestBuildInventoryPreservesAllToolDefinitions(t *testing.T) {
 		} else {
 			content += "false\n"
 		}
-		content += "description: test\n"
+		content += "deployment:\n  family: " + family + "\n  runtime: " + runtime + "\ndescription: test\n"
 		if err := os.WriteFile(filepath.Join(toolsDir, name+".yaml"), []byte(content), 0644); err != nil {
 			t.Fatal(err)
 		}
 	}
-	write("alpha", "alpha", true)
-	write("query_execution_result", "internal:query_execution_result", true)
-	write("disabled", "disabled", false)
+	write("alpha", "alpha", true, "utility", "family")
+	write("query_execution_result", "internal:query_execution_result", true, "control", "builtin")
+	write("disabled", "disabled", false, "utility", "disabled")
 
 	catalog := Catalog{
 		Tools: []Tool{
@@ -66,11 +66,53 @@ func TestBuildInventoryPreservesAllToolDefinitions(t *testing.T) {
 	}
 }
 
+func TestBuildInventoryRequiresExplicitDeploymentMetadata(t *testing.T) {
+	root := t.TempDir()
+	content := `name: unnamed
+command: unnamed
+enabled: true
+description: missing deployment metadata
+`
+	if err := os.WriteFile(filepath.Join(root, "unnamed.yaml"), []byte(content), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := BuildInventory(root, Catalog{}); err == nil {
+		t.Fatal("expected inventory generation to reject missing deployment metadata")
+	}
+}
+
+func TestBuildInventoryUsesDeclaredAdapter(t *testing.T) {
+	root := t.TempDir()
+	content := `name: scanner-alias
+command: scanner-alias
+enabled: true
+deployment:
+  family: web
+  runtime: external-adapter
+  adapter: nuclei_scan
+description: fixed adapter alias
+`
+	if err := os.WriteFile(filepath.Join(root, "scanner-alias.yaml"), []byte(content), 0644); err != nil {
+		t.Fatal(err)
+	}
+	catalog := Catalog{Tools: []Tool{{ID: "nuclei_scan", Enabled: true}}}
+	inv, err := BuildInventory(root, catalog)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(inv.Tools) != 1 || inv.Tools[0].Adapter != "nuclei_scan" || inv.Tools[0].Runtime != DeploymentRuntimeExternalAdapter {
+		t.Fatalf("declared adapter was not preserved: %#v", inv.Tools)
+	}
+}
+
 func TestCheckRuntimeReportsBuiltinAndMissing(t *testing.T) {
 	root := t.TempDir()
 	content := `name: builtin
 command: internal:test
 enabled: true
+deployment:
+  family: control
+  runtime: builtin
 description: builtin
 `
 	if err := os.WriteFile(filepath.Join(root, "builtin.yaml"), []byte(content), 0644); err != nil {
@@ -79,6 +121,9 @@ description: builtin
 	content = `name: missing
 command: command-that-does-not-exist-cyberstrike
 enabled: true
+deployment:
+  family: utility
+  runtime: family
 description: missing
 `
 	if err := os.WriteFile(filepath.Join(root, "missing.yaml"), []byte(content), 0644); err != nil {
@@ -102,6 +147,9 @@ func TestCheckRuntimeFamilyFiltersDefinitions(t *testing.T) {
 	content := `name: nmap
 command: nmap
 enabled: true
+deployment:
+  family: recon
+  runtime: family
 description: recon
 `
 	if err := os.WriteFile(filepath.Join(root, "nmap.yaml"), []byte(content), 0644); err != nil {
@@ -110,6 +158,9 @@ description: recon
 	content = `name: checkov
 command: checkov
 enabled: true
+deployment:
+  family: cloud
+  runtime: family
 description: cloud
 `
 	if err := os.WriteFile(filepath.Join(root, "checkov.yaml"), []byte(content), 0644); err != nil {

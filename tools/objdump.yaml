@@ -1,6 +1,9 @@
 name: "objdump"
 command: "objdump"
 enabled: true
+deployment:
+  family: binary-forensics
+  runtime: family
 short_description: "二进制文件反汇编工具"
 description: |
   Objdump是GNU binutils的一部分，用于反汇编二进制文件。

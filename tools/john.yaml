@@ -1,6 +1,9 @@
 name: "john"
 command: "john"
 enabled: true
+deployment:
+  family: binary-forensics
+  runtime: family
 short_description: "John the Ripper密码破解工具"
 description: |
   John the Ripper是一个快速的密码破解工具，支持多种哈希算法。

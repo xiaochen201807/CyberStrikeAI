@@ -1,6 +1,9 @@
 name: "kube-hunter"
 command: "kube-hunter"
 enabled: true
+deployment:
+  family: cloud
+  runtime: family
 short_description: "Kubernetes渗透测试工具"
 description: |
   Kube-hunter是一个Kubernetes渗透测试工具，用于发现Kubernetes集群中的安全问题。

@@ -1,6 +1,9 @@
 name: "pwninit"
 command: "pwninit"
 enabled: true
+deployment:
+  family: binary-forensics
+  runtime: family
 short_description: "CTF二进制漏洞利用设置工具"
 description: |
   Pwninit是一个用于CTF二进制漏洞利用设置的工具，自动配置libc和loader。

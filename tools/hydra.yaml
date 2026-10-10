@@ -2,6 +2,9 @@ name: "hydra"
 command: "hydra"
 args: ["-I"]
 enabled: true
+deployment:
+  family: identity
+  runtime: family
 short_description: "密码暴力破解工具，支持多种协议和服务"
 description: |
   Hydra 是网络登录口令爆破工具，支持 SSH、FTP、HTTP、SMB 等多种协议。

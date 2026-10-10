@@ -1,6 +1,10 @@
 name: "nuclei"
 command: "nuclei"
 enabled: true
+deployment:
+  family: web
+  runtime: external-adapter
+  adapter: nuclei_scan
 short_description: "快速漏洞扫描器，使用YAML模板进行漏洞检测"
 description: |
   Nuclei是一个基于模板的快速漏洞扫描器，使用社区维护的YAML模板进行漏洞检测。

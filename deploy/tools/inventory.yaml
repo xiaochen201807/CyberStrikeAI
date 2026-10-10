@@ -138,7 +138,7 @@ tools:
       enabled: false
       layer: control
       family: cloud
-      runtime: native
+      runtime: disabled
       containerized: false
       availability: disabled
       binary_status: disabled
@@ -247,7 +247,7 @@ tools:
       enabled: true
       layer: control
       family: control
-      runtime: native
+      runtime: control-image
       containerized: true
       runtime_image: cyberstrike-ai:control
       runtime_service: cyberstrike-ai
@@ -261,7 +261,7 @@ tools:
       enabled: true
       layer: control
       family: control
-      runtime: native
+      runtime: control-image
       containerized: true
       runtime_image: cyberstrike-ai:control
       runtime_service: cyberstrike-ai
@@ -303,7 +303,7 @@ tools:
       enabled: false
       layer: control
       family: web
-      runtime: native
+      runtime: disabled
       containerized: false
       availability: disabled
       binary_status: disabled
@@ -342,7 +342,7 @@ tools:
       enabled: false
       layer: control
       family: external-intel
-      runtime: native
+      runtime: disabled
       containerized: false
       availability: disabled
       binary_status: disabled
@@ -367,7 +367,7 @@ tools:
       enabled: false
       layer: control
       family: recon
-      runtime: native
+      runtime: disabled
       containerized: false
       availability: disabled
       binary_status: disabled
@@ -420,7 +420,7 @@ tools:
       enabled: false
       layer: control
       family: web
-      runtime: native
+      runtime: disabled
       containerized: false
       availability: disabled
       binary_status: disabled
@@ -515,7 +515,7 @@ tools:
       enabled: true
       layer: control
       family: control
-      runtime: native
+      runtime: control-image
       containerized: true
       runtime_image: cyberstrike-ai:control
       runtime_service: cyberstrike-ai
@@ -627,7 +627,7 @@ tools:
       enabled: false
       layer: control
       family: utility
-      runtime: native
+      runtime: disabled
       containerized: false
       availability: disabled
       binary_status: disabled
@@ -791,7 +791,7 @@ tools:
       enabled: false
       layer: control
       family: cloud
-      runtime: native
+      runtime: disabled
       containerized: false
       availability: disabled
       binary_status: disabled
@@ -858,7 +858,7 @@ tools:
       enabled: false
       layer: control
       family: external-intel
-      runtime: native
+      runtime: disabled
       containerized: false
       availability: disabled
       binary_status: disabled
@@ -979,7 +979,7 @@ tools:
       enabled: false
       layer: control
       family: external-intel
-      runtime: native
+      runtime: disabled
       containerized: false
       availability: disabled
       binary_status: disabled
@@ -1088,7 +1088,7 @@ tools:
       enabled: false
       layer: control
       family: external-intel
-      runtime: native
+      runtime: disabled
       containerized: false
       availability: disabled
       binary_status: disabled
@@ -1210,7 +1210,7 @@ tools:
       enabled: false
       layer: control
       family: external-intel
-      runtime: native
+      runtime: disabled
       containerized: false
       availability: disabled
       binary_status: disabled

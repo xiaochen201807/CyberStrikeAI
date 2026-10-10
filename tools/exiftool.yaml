@@ -1,6 +1,9 @@
 name: "exiftool"
 command: "exiftool"
 enabled: true
+deployment:
+  family: binary-forensics
+  runtime: family
 short_description: "元数据提取工具"
 description: |
   ExifTool用于读取、写入和编辑各种文件格式的元数据。

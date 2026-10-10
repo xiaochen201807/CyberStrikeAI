@@ -1,6 +1,9 @@
 name: "ropgadget"
 command: "ROPgadget"
 enabled: true
+deployment:
+  family: binary-forensics
+  runtime: family
 short_description: "ROP gadget搜索工具"
 description: |
   ROPgadget是一个用于在二进制文件中搜索ROP gadget的工具。

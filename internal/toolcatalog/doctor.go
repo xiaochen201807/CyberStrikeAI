@@ -24,9 +24,9 @@ func CheckRuntime(toolsDir string, includeDisabled bool) ([]ToolCheck, error) {
 }
 
 // CheckRuntimeFamily is the family-scoped variant used by the independent
-// runtime images.  Keeping the filter here means the image build and the
-// repository inventory use the same family classification instead of carrying
-// a second hand-maintained command list in shell.
+// runtime images. Keeping the filter here means the image build and the
+// repository inventory use the same explicit deployment metadata instead of
+// carrying a second hand-maintained command list in shell.
 func CheckRuntimeFamily(toolsDir string, includeDisabled bool, family string) ([]ToolCheck, error) {
 	tools, err := config.LoadToolsFromDir(toolsDir)
 	if err != nil {
@@ -35,7 +35,14 @@ func CheckRuntimeFamily(toolsDir string, includeDisabled bool, family string) ([
 	family = strings.ToLower(strings.TrimSpace(family))
 	checks := make([]ToolCheck, 0, len(tools))
 	for _, tool := range tools {
-		if family != "" && ClassifyToolFamily(tool.Name, tool.Command) != family {
+		deployment, deploymentErr := ResolveToolDeployment(tool)
+		if deploymentErr != nil {
+			return nil, fmt.Errorf("tool %q deployment metadata invalid: %w", tool.Name, deploymentErr)
+		}
+		// Fixed adapters such as Nuclei and ZAP have their own images. They
+		// remain in the repository catalog, but a family image must not claim
+		// responsibility for their executable checks.
+		if family != "" && (deployment.Family != family || deployment.Runtime != DeploymentRuntimeFamily) {
 			continue
 		}
 		check := ToolCheck{ID: tool.Name, Command: tool.Command}

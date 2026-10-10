@@ -133,8 +133,8 @@ case "$family" in
     ;;
   web)
     apt_install_available \
-      arjun dalfox dirsearch dotdotpwn ffuf gobuster graphqlmap nikto nuclei \
-      paramspider sqlmap wafw00f wpscan xsser zaproxy
+      arjun dalfox dirsearch dotdotpwn ffuf gobuster graphqlmap nikto \
+      paramspider sqlmap wafw00f wpscan xsser
     git clone --depth 1 https://github.com/ticarpi/jwt_tool.git /opt/jwt_tool
     "$python_venv/bin/pip" install --no-cache-dir -r /opt/jwt_tool/requirements.txt
     cat > /usr/local/bin/jwt_tool <<'EOF'

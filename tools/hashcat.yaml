@@ -1,6 +1,9 @@
 name: "hashcat"
 command: "hashcat"
 enabled: true
+deployment:
+  family: binary-forensics
+  runtime: family
 short_description: "高级密码破解工具，支持GPU加速"
 description: |
   Hashcat是一个高级密码恢复工具，支持多种哈希算法和攻击模式。

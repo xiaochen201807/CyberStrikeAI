@@ -1,6 +1,9 @@
 name: "subfinder"
 command: "subfinder"
 enabled: true
+deployment:
+  family: recon
+  runtime: family
 short_description: "被动子域名发现工具，使用多个数据源"
 description: |
   Subfinder是一个被动子域名发现工具，通过查询多个数据源来发现子域名。

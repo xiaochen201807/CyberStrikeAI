@@ -1,6 +1,9 @@
 name: "terrascan"
 command: "terrascan"
 enabled: true
+deployment:
+  family: cloud
+  runtime: family
 short_description: "基础设施即代码安全扫描工具"
 description: |
   Terrascan是一个基础设施即代码安全扫描工具，用于检测IaC配置中的安全问题。

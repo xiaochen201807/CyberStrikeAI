@@ -40,7 +40,7 @@ type InventoryTool struct {
 	RuntimeImage   string `yaml:"runtime_image,omitempty"`
 	RuntimeService string `yaml:"runtime_service,omitempty"`
 	Availability   string `yaml:"availability"`  // enabled | disabled | builtin
-	BinaryStatus   string `yaml:"binary_status"` // unverified | runtime-declared | adapter-ready | builtin | disabled
+	BinaryStatus   string `yaml:"binary_status"` // control-image | unverified | runtime-declared | adapter-ready | builtin | disabled
 	Migration      string `yaml:"migration"`     // preserved | runtime-declared | adapter-ready | pending
 	Notes          string `yaml:"notes,omitempty"`
 }
@@ -179,6 +179,17 @@ func BuildInventoryWithRuntime(toolsDir string, catalog Catalog, runtimeManifest
 				}
 				entry.Notes = "已有独立工具平面适配器；工具 YAML 仍保留，保证原有名称和参数兼容。"
 			}
+		}
+		// Shell/Python helpers are intentionally control-plane capabilities, not
+		// scanner-family commands.  The control Dockerfile installs and checks
+		// their interpreters, so record that executable runtime explicitly.
+		if entry.Enabled && entry.Family == "control" && entry.Runtime == "native" {
+			entry.Containerized = true
+			entry.RuntimeImage = "cyberstrike-ai:control"
+			entry.RuntimeService = "cyberstrike-ai"
+			entry.BinaryStatus = "control-image"
+			entry.Migration = "preserved"
+			entry.Notes = "由控制平面镜像提供 sh、bash、python3 和 venv 运行时；不迁移到扫描器族镜像。"
 		}
 		if !entry.Containerized && entry.Enabled && entry.Runtime != "builtin" && len(runtimeManifest.Families) > 0 {
 			if runtime, ok := runtimeManifest.Families[entry.Family]; ok {

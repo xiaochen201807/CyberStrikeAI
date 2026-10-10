@@ -22,8 +22,9 @@ deploy/tools/
 
 当前仓库提供 Nuclei/ZAP 固定适配器，以及按 recon、web、identity、binary-forensics、cloud、
 exploitation、external-intel、utility 拆分的 8 个独立运行时镜像。仓库原有 `tools/*.yaml` 仍然完整
-保留并由控制平面加载；`inventory.yaml` 会把 73 个可迁移工具映射到对应族镜像，3 个控制平面 Shell
-能力继续留在控制平面，12 个定义保持禁用。每个族镜像构建末尾都会运行 `toolcatalog doctor --strict`，
+保留并由控制平面加载；`inventory.yaml` 会把 73 个可迁移工具映射到对应族镜像，3 个控制平面
+Shell/Python 能力由控制面镜像提供，12 个定义保持禁用。每个族镜像构建末尾都会运行
+`toolcatalog doctor --strict`，
 缺少命令会让 CI 失败，不会等到线上调用才暴露。
 
 catalog 的 `profile` 是逻辑工具族；`compose_profile` 把长驻 MCP 和一次性任务分开，避免执行
@@ -119,7 +120,8 @@ docker compose -f docker-compose.runtime.yml --env-file .env \
 ```
 
 也可以同时启动多个族 profile；高风险族建议放到单独 Runner。`exec`、`execute-python-script`、
-`install-python-package` 等控制平面 Shell 能力不会被迁移到族镜像。镜像缺少命令时，构建阶段的
+`install-python-package` 等控制平面 Shell 能力不会被迁移到族镜像，而是由控制面镜像中的
+Bash/Python/venv 提供。镜像缺少命令时，构建阶段的
 严格 doctor 和服务启动时的 `TOOL_PRECHECK=1` 都会失败。
 
 也可以把仓库挂入该运行时后执行：

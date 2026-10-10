@@ -246,10 +246,13 @@ tools:
       layer: control
       family: control
       runtime: native
-      containerized: false
+      containerized: true
+      runtime_image: cyberstrike-ai:control
+      runtime_service: cyberstrike-ai
       availability: enabled
-      binary_status: unverified
+      binary_status: control-image
       migration: preserved
+      notes: 由控制平面镜像提供 sh、bash、python3 和 venv 运行时；不迁移到扫描器族镜像。
     - id: execute-python-script
       source: tools/execute-python-script.yaml
       command: /bin/bash
@@ -257,10 +260,13 @@ tools:
       layer: control
       family: control
       runtime: native
-      containerized: false
+      containerized: true
+      runtime_image: cyberstrike-ai:control
+      runtime_service: cyberstrike-ai
       availability: enabled
-      binary_status: unverified
+      binary_status: control-image
       migration: preserved
+      notes: 由控制平面镜像提供 sh、bash、python3 和 venv 运行时；不迁移到扫描器族镜像。
     - id: exiftool
       source: tools/exiftool.yaml
       command: exiftool
@@ -508,10 +514,13 @@ tools:
       layer: control
       family: control
       runtime: native
-      containerized: false
+      containerized: true
+      runtime_image: cyberstrike-ai:control
+      runtime_service: cyberstrike-ai
       availability: enabled
-      binary_status: unverified
+      binary_status: control-image
       migration: preserved
+      notes: 由控制平面镜像提供 sh、bash、python3 和 venv 运行时；不迁移到扫描器族镜像。
     - id: jaeles
       source: tools/jaeles.yaml
       command: jaeles

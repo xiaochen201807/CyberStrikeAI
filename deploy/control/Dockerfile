@@ -12,7 +12,8 @@ RUN CGO_ENABLED=1 GOOS=linux go build -trimpath -ldflags='-s -w' -o /out/cyberst
 FROM debian:bookworm-slim
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates curl \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates curl bash python3 python3-pip python3-venv \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --system --create-home --uid 10001 --shell /usr/sbin/nologin cyberstrike
 
@@ -33,6 +34,17 @@ COPY --from=builder /src/knowledge_base /app/knowledge_base
 COPY --from=builder /src/tools /app/tools
 COPY --from=builder /src/tools /app/config/tools
 COPY deploy/control/entrypoint.sh /app/entrypoint.sh
+
+# The three control-plane command tools are intentionally kept out of the
+# scanner images, but they must still be executable in the control image.
+# Validate the interpreter and per-user venv path while building the image so
+# a slim-base change cannot silently break these existing capabilities.
+RUN command -v sh >/dev/null \
+    && command -v bash >/dev/null \
+    && command -v python3 >/dev/null \
+    && python3 -m venv /tmp/cyberstrike-control-venv \
+    && /tmp/cyberstrike-control-venv/bin/python -c 'print("control runtime ok")' \
+    && rm -rf /tmp/cyberstrike-control-venv
 
 RUN mkdir -p /app/config /app/data /app/log /app/chat_uploads \
     && chown -R cyberstrike:cyberstrike /app

@@ -7,9 +7,10 @@ sqlmap 等扫描器二进制塞进控制镜像；二进制由 `deploy/tools/dock
 
 当前仓库工具清单以 `tools/*.yaml` 为准，共 90 个定义，其中 78 个启用、12 个禁用。完整
 部署状态见 [`deploy/tools/inventory.yaml`](../../deploy/tools/inventory.yaml)。73 个可迁移工具已经
-映射到 8 个独立工具族镜像；Nuclei/ZAP 仍使用固定的专用适配器；3 个控制平面 Shell 能力和 1 个
-内部工具不会迁移到外部运行时。镜像构建阶段会对每个族执行严格 `toolcatalog doctor`，因此
-`runtime-declared` 表示已有明确构建配方，CI 通过后再视为已验证执行路径。
+映射到 8 个独立工具族镜像；3 个控制平面 Shell/Python 能力由控制面镜像提供；Nuclei/ZAP 仍使用
+固定的专用适配器；1 个内部工具不会迁移到外部运行时。镜像构建阶段会对每个族执行严格
+`toolcatalog doctor`，控制面 Dockerfile 也会检查 Bash/Python/venv，因此 `runtime-declared` 和
+`control-image` 都表示已有明确构建配方，CI 通过后再视为已验证执行路径。
 
 工具定义发生变化后重新生成清单：
 

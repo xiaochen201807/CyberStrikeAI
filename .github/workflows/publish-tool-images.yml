@@ -36,6 +36,7 @@ jobs:
           context: .
           file: deploy/control/Dockerfile
           push: true
+          platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: true
@@ -72,6 +73,7 @@ jobs:
           build-args: |
             TOOL_FAMILY=${{ matrix.family }}
           push: true
+          platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: true
@@ -110,9 +112,75 @@ jobs:
           build-args: |
             TOOL_BASE_IMAGE=${{ matrix.base_image }}
           push: true
+          platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: true
           sbom: true
           cache-from: type=gha,scope=cyberstrike-${{ matrix.name }}-publish
           cache-to: type=gha,mode=max,scope=cyberstrike-${{ matrix.name }}-publish
+
+  smoke-published-stack:
+    name: Smoke test published single-VM stack
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [publish-control, publish-family-runtimes, publish-fixed-adapters]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/setup-buildx-action@v3
+      - name: Resolve immutable image references
+        id: images
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          OWNER: ${{ github.repository_owner }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          digest_for() {
+            docker buildx imagetools inspect "$1" | awk '/^Digest:/ { print $2; exit }'
+          }
+          image_ref() {
+            image="$1"
+            ref="ghcr.io/${OWNER}/${image}:${RELEASE_TAG}"
+            printf '%s@%s' "$ref" "$(digest_for "$ref")"
+          }
+          {
+            echo "control=$(image_ref cyberstrike-ai)"
+            echo "recon=$(image_ref cyberstrike-tool-runtime-recon)"
+            echo "web=$(image_ref cyberstrike-tool-runtime-web)"
+          } >> "$GITHUB_OUTPUT"
+      - name: Start and verify the published stack
+        env:
+          CYBERSTRIKE_IMAGE: ${{ steps.images.outputs.control }}
+          RECON_IMAGE: ${{ steps.images.outputs.recon }}
+          WEB_IMAGE: ${{ steps.images.outputs.web }}
+          TOOL_MCP_TOKEN: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+          TOOL_ALLOWED_HOSTS: example.com
+          CYBERSTRIKE_PLATFORM: linux/amd64
+          BUILD_IMAGES: "0"
+          RUNTIME_PROFILES: runtime-recon runtime-web
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p deploy/tools/data
+          cat > deploy/tools/.env <<EOF
+          CYBERSTRIKE_PLATFORM=${CYBERSTRIKE_PLATFORM}
+          CYBERSTRIKE_IMAGE=${CYBERSTRIKE_IMAGE}
+          RECON_IMAGE=${RECON_IMAGE}
+          WEB_IMAGE=${WEB_IMAGE}
+          TOOL_MCP_TOKEN=${TOOL_MCP_TOKEN}
+          TOOL_ALLOWED_HOSTS=${TOOL_ALLOWED_HOSTS}
+          TOOLS_COMPOSE_PROJECT=cyberstrike-tools
+          TOOLS_EGRESS_NETWORK=cyberstrike-tools-egress
+          CYBERSTRIKE_CONTROL_NETWORK=cyberstrike-control
+          EOF
+          trap 'docker compose --env-file deploy/tools/.env -f deploy/tools/docker-compose.runtime.yml --profile runtime-recon --profile runtime-web down --volumes || true; docker compose --env-file deploy/tools/.env -f deploy/control/docker-compose.yml down --volumes || true' EXIT
+          ./deploy/start-stack.sh
+          curl -kfsS https://127.0.0.1:8080/healthz
+          curl -kfsS https://127.0.0.1:8080/readyz

@@ -39,5 +39,13 @@ Nuclei/ZAP 适配器和 8 个工具族运行时，其余控制平面能力及禁
 配置、数据库、日志、上传件和可编辑资源分别使用命名卷保存。升级镜像前应备份：
 
 ```bash
-docker compose run --rm cyberstrike-ai sh -c 'tar czf - /app/config /app/data /app/roles /app/skills /app/agents /app/knowledge_base'
+cd ../..
+./deploy/backup-stack.sh
+```
+
+需要恢复时先保持服务停止，再执行：
+
+```bash
+./deploy/restore-stack.sh ./backups/20260101T000000Z
+./deploy/start-stack.sh
 ```

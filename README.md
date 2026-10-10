@@ -205,6 +205,13 @@ The `run.sh` script will automatically:
 - ✅ Build the project
 - ✅ Start the server
 
+For a single Docker VM with the independent tool plane, use
+[`deploy/start-stack.sh`](deploy/start-stack.sh). It validates the runtime
+configuration, waits for the control plane and selected tool families to pass
+health checks, and supports `BUILD_IMAGES=0` with immutable GHCR references.
+Use [`deploy/backup-stack.sh`](deploy/backup-stack.sh) before upgrades and
+[`deploy/restore-stack.sh`](deploy/restore-stack.sh) when restoring a VM.
+
 **Verify the startup:**
 
 1. Confirm the terminal displays `● ONLINE` followed by the actual Web UI URL.

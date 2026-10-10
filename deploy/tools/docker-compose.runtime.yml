@@ -11,6 +11,7 @@ x-runtime-build: &runtime-build
     TOOL_BASE_IMAGE: ${TOOL_BASE_IMAGE:-kalilinux/kali-rolling@sha256:c717f201f29a7e0a9126c0d51bd08aa7194ac82f53c57314339182f92b0b1585}
 
 x-runtime-common: &runtime-common
+  platform: ${CYBERSTRIKE_PLATFORM:-linux/amd64}
   init: true
   environment: &runtime-environment
     TOOL_DEFINITIONS_DIR: /etc/cyberstrike/tools

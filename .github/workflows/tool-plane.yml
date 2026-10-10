@@ -50,7 +50,7 @@ jobs:
           docker compose -f deploy/tools/docker-compose.yml --env-file deploy/tools/.env.example config --quiet
           docker compose -f deploy/tools/docker-compose.runtime.yml --env-file deploy/tools/.env.example config --quiet
       - name: Check shell wrappers
-        run: sh -n deploy/control/entrypoint.sh deploy/tools/scripts/*.sh
+        run: sh -n deploy/control/entrypoint.sh deploy/start-stack.sh deploy/check-stack.sh deploy/backup-stack.sh deploy/restore-stack.sh deploy/tools/scripts/*.sh
 
   # Build every image that is shipped by the independent Compose projects.
   # This is an actual BuildKit build with push disabled: a green job means the
@@ -92,6 +92,7 @@ jobs:
             TOOL_BASE_IMAGE=${{ matrix.base_image }}
           load: true
           push: false
+          platforms: linux/amd64
           provenance: false
           sbom: false
           cache-from: type=gha,scope=cyberstrike-${{ matrix.name }}
@@ -136,6 +137,7 @@ jobs:
           build-args: |
             TOOL_FAMILY=${{ matrix.family }}
           push: false
+          platforms: linux/amd64
           provenance: false
           sbom: false
           cache-from: type=gha,scope=cyberstrike-runtime-${{ matrix.family }}

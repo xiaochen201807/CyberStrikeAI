@@ -196,6 +196,11 @@ cd CyberStrikeAI
 chmod +x run.sh && ./run.sh
 ```
 
+如果要在单台 Docker VM 上运行控制面和独立工具族，使用
+[`deploy/start-stack.sh`](deploy/start-stack.sh)。它会等待控制面和所选工具族健康后才返回；
+升级前可用 [`deploy/backup-stack.sh`](deploy/backup-stack.sh) 备份，用
+[`deploy/restore-stack.sh`](deploy/restore-stack.sh) 恢复。
+
 `run.sh` 脚本会自动完成：
 - ✅ 检查并验证 Go 和 Python 环境
 - ✅ 创建 Python 虚拟环境

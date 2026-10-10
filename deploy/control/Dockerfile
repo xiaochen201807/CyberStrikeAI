@@ -13,7 +13,7 @@ FROM debian:bookworm-slim
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        ca-certificates curl bash python3 python3-pip python3-venv \
+        ca-certificates curl bash tar findutils python3 python3-pip python3-venv \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --system --create-home --uid 10001 --shell /usr/sbin/nologin cyberstrike
 

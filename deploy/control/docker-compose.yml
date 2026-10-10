@@ -2,6 +2,7 @@ name: ${CONTROL_COMPOSE_PROJECT:-cyberstrike-control}
 
 services:
   cyberstrike-ai:
+    platform: ${CYBERSTRIKE_PLATFORM:-linux/amd64}
     build:
       context: ../..
       dockerfile: deploy/control/Dockerfile

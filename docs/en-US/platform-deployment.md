@@ -8,6 +8,10 @@ Cloudflare Workers/Pages are not a drop-in host for the current Go plus Docker C
 
 ## Start on a Docker host
 
+The current release target is a single `linux/amd64` Docker VM. Some family
+installers use upstream `x86_64` binaries; ARM hosts require Docker amd64
+emulation until the installers are validated natively.
+
 ```bash
 git clone https://github.com/xiaochen201807/CyberStrikeAI.git
 cd CyberStrikeAI
@@ -17,7 +21,22 @@ openssl rand -hex 32
 ./deploy/start-stack.sh
 ```
 
-The helper starts the control Compose project first (creating the shared network), then starts `runtime-recon` and `runtime-web`. Select more families with `RUNTIME_PROFILES`, or set `BUILD_IMAGES=0` after filling the `.env` file with immutable GHCR image references.
+The helper validates the MCP token and target allowlist, starts the control
+Compose project first (creating the shared network), starts `runtime-recon` and
+`runtime-web`, and waits for `/readyz` plus each selected family's
+`tool-mcp -probe`. Select more families with `RUNTIME_PROFILES`, or set
+`BUILD_IMAGES=0` after filling the `.env` file with immutable GHCR image
+references. Run `./deploy/check-stack.sh` later to repeat the health check.
+
+Before an upgrade, create a consistent single-VM backup:
+
+```bash
+./deploy/backup-stack.sh
+./deploy/restore-stack.sh ./backups/20260101T000000Z
+```
+
+The restore command leaves the stack stopped for review before running
+`./deploy/start-stack.sh`.
 
 ## Publish from GitHub
 

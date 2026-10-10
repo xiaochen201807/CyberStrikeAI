@@ -15,7 +15,9 @@ GitHub 是代码和镜像交付面，实际扫描必须落在有明确网络出�
 
 ## 本地或 Linux VM：一条命令启动
 
-先准备 Docker Compose、一个 AI 通道和已授权目标范围：
+当前交付目标是 **linux/amd64 单 Docker VM**。镜像中的部分工具使用上游
+`x86_64` 发布包；在 ARM 主机上必须配置 Docker 的 amd64 仿真，或等待单独的 arm64
+适配验收。先准备 Docker Compose、一个 AI 通道和已授权目标范围：
 
 ```bash
 git clone https://github.com/xiaochen201807/CyberStrikeAI.git
@@ -36,7 +38,8 @@ openssl rand -hex 32
 ./deploy/start-stack.sh
 ```
 
-脚本先启动控制平面建立共享网络，再启动选中的工具族。要启用全部已经通过镜像验收的工具族：
+脚本会先检查 token、目标白名单和 Docker Compose，再启动控制平面建立共享网络，拉起选中的工具族，
+最后等待 `/readyz` 和每个工具族的 `tool-mcp -probe` 通过。要启用全部已经通过镜像验收的工具族：
 
 ```bash
 RUNTIME_PROFILES="runtime-recon runtime-web runtime-identity runtime-binary runtime-cloud runtime-exploitation runtime-external-intel runtime-utility" \
@@ -50,6 +53,32 @@ docker compose --env-file deploy/tools/.env -f deploy/control/docker-compose.yml
 docker compose --env-file deploy/tools/.env -f deploy/tools/docker-compose.runtime.yml ps
 curl -kfsS https://127.0.0.1:8080/healthz
 ```
+
+`BUILD_IMAGES=0` 时脚本会先拉取 `.env` 中的镜像；生产环境应把控制面和所选族镜像都写成带
+`@sha256:...` 的 GHCR 引用。单独检查已经运行的栈可以执行：
+
+```bash
+RUNTIME_PROFILES="runtime-recon runtime-web" ./deploy/check-stack.sh
+```
+
+### 备份和恢复
+
+单 VM 默认使用 SQLite 和 Docker 命名卷。升级或改配置前先做一致性备份：
+
+```bash
+./deploy/backup-stack.sh
+```
+
+脚本会短暂停止控制面和工具族，备份控制面配置、数据库、日志、上传文件、角色/技能/代理/知识库，
+以及 `deploy/tools/data`，完成后恢复原先运行中的服务。恢复时保持服务停止：
+
+```bash
+./deploy/restore-stack.sh ./backups/20260101T000000Z
+./deploy/start-stack.sh
+```
+
+恢复脚本会先把现有工具数据目录改名保存，不会静默覆盖它；生产环境仍应把 `backups/` 复制到另一台
+主机或对象存储。
 
 控制台默认只绑定 `127.0.0.1`。首次启动后在 Web 界面完成管理员密码和 AI 通道配置，再登记外部 MCP 服务。工具容器不发布宿主机端口，控制面通过 Docker 内部网络访问它们。
 

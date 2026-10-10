@@ -10,6 +10,8 @@ deploy/tools/
   catalog.yaml              # 工具能力、风险、目标和报告契约
   inventory.yaml            # 当前仓库 90 个工具定义的完整迁移状态
   docker-compose.yml        # 工具容器运行定义
+  docker-compose.runtime.yml # 8 个独立工具族运行时
+  runtime/                  # 运行时构建脚本和族清单
   scripts/                  # 只读包装脚本
   data/targets/             # 目标输入
   data/reports/             # 扫描输出
@@ -18,11 +20,11 @@ deploy/tools/
 `catalog.yaml` 是工具政策清单，`docker-compose.yml` 是运行清单。两者不能
 互相替代：Compose 不表达项目白名单、人工审批和结果格式。
 
-当前仓库先提供 Nuclei 和 ZAP 的可运行适配器。仓库原有 `tools/*.yaml` 仍然完整保留并由控制平面
-加载；`inventory.yaml` 明确哪些工具已有容器适配器，哪些仍按原有运行时执行。`availability: enabled`
-只表示定义启用，只有 `binary_status: adapter-ready` 或 `builtin` 才表示本清单已有可验证执行路径。
-新增 nmap、sqlmap、subfinder 等工具时，应为它们补齐镜像、固定参数包装器、catalog 条目和结果适配器，
-完成后再把清单状态改为 `external-adapter`。
+当前仓库提供 Nuclei/ZAP 固定适配器，以及按 recon、web、identity、binary-forensics、cloud、
+exploitation、external-intel、utility 拆分的 8 个独立运行时镜像。仓库原有 `tools/*.yaml` 仍然完整
+保留并由控制平面加载；`inventory.yaml` 会把 73 个可迁移工具映射到对应族镜像，3 个控制平面 Shell
+能力继续留在控制平面，12 个定义保持禁用。每个族镜像构建末尾都会运行 `toolcatalog doctor --strict`，
+缺少命令会让 CI 失败，不会等到线上调用才暴露。
 
 catalog 的 `profile` 是逻辑工具族；`compose_profile` 把长驻 MCP 和一次性任务分开，避免执行
 `docker compose --profile web-mcp up` 时误启动批量扫描任务。
@@ -102,25 +104,23 @@ external_mcp:
 
 ### 按工具族接入现有 YAML 定义
 
-如果已经准备好一个只包含某个工具族的运行时镜像，可以启用通用兼容适配器。它直接读取仓库的
-`tools/*.yaml`，复用同一套参数 schema 和命令参数映射，不需要为每个工具重新写一份 Agent 接口：
+运行时镜像已经由仓库提供构建入口。只启动需要的工具族，服务会直接读取仓库的 `tools/*.yaml`，
+复用同一套参数 schema 和命令参数映射，不需要为每个工具重新写一份 Agent 接口：
 
 ```bash
-# deploy/tools/.env：镜像必须实际包含下面三个命令，并固定到 digest
-TOOL_RUNTIME_IMAGE=registry.example/cyberstrike-recon-runtime:2026.10@sha256:<digest>
-# 二选一：按清单显式选择，或按 inventory.yaml 的工具族选择
-TOOL_FAMILY=recon
-# TOOL_IDS=nmap,subfinder,amass
+# 先启动控制平面以创建内部网络
+cd ../control && docker compose up -d --build
+cd ../tools
+cp .env.example .env
 TOOL_ALLOWED_HOSTS=authorized.example.com,*.authorized.example.com
 
-docker compose --profile compat-mcp up -d --build tool-compat-mcp
+docker compose -f docker-compose.runtime.yml --env-file .env \
+  --profile runtime-recon up -d --build runtime-recon-mcp
 ```
 
-通用适配器是迁移桥，不是“万能大镜像”：一次只接入一个工具族运行时。`TOOL_IDS` 中的工具，或
-`TOOL_FAMILY` 选中的工具，必须在 inventory.yaml 中存在且启用；`exec`、`execute-python-script`、
-`install-python-package` 等控制平面 Shell 能力会被适配器拒绝。镜像缺少命令时，调用会返回明确的
-执行错误；`TOOL_PRECHECK=1`（默认）还会让服务启动前直接报告缺失命令。因此上线前必须在该运行时内
-逐项执行 `command -v` 验收。
+也可以同时启动多个族 profile；高风险族建议放到单独 Runner。`exec`、`execute-python-script`、
+`install-python-package` 等控制平面 Shell 能力不会被迁移到族镜像。镜像缺少命令时，构建阶段的
+严格 doctor 和服务启动时的 `TOOL_PRECHECK=1` 都会失败。
 
 也可以把仓库挂入该运行时后执行：
 

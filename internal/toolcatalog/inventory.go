@@ -1,6 +1,7 @@
 package toolcatalog
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -27,26 +28,89 @@ type ToolInventory struct {
 }
 
 type InventoryTool struct {
-	ID            string `yaml:"id"`
-	Source        string `yaml:"source"`
-	Command       string `yaml:"command"`
-	Enabled       bool   `yaml:"enabled"`
-	Layer         string `yaml:"layer"`   // control | tool-plane
-	Family        string `yaml:"family"`  // logical capability group
-	Runtime       string `yaml:"runtime"` // builtin | native | external-adapter
-	Containerized bool   `yaml:"containerized"`
-	Adapter       string `yaml:"adapter,omitempty"` // deployment catalog id, if one exists
-	Availability  string `yaml:"availability"`      // enabled | disabled | builtin
-	BinaryStatus  string `yaml:"binary_status"`     // unverified | adapter-ready | builtin | disabled
-	Migration     string `yaml:"migration"`         // preserved | adapter-ready | pending
-	Notes         string `yaml:"notes,omitempty"`
+	ID             string `yaml:"id"`
+	Source         string `yaml:"source"`
+	Command        string `yaml:"command"`
+	Enabled        bool   `yaml:"enabled"`
+	Layer          string `yaml:"layer"`   // control | tool-plane
+	Family         string `yaml:"family"`  // logical capability group
+	Runtime        string `yaml:"runtime"` // builtin | native | external-adapter
+	Containerized  bool   `yaml:"containerized"`
+	Adapter        string `yaml:"adapter,omitempty"` // deployment catalog id, if one exists
+	RuntimeImage   string `yaml:"runtime_image,omitempty"`
+	RuntimeService string `yaml:"runtime_service,omitempty"`
+	Availability   string `yaml:"availability"`  // enabled | disabled | builtin
+	BinaryStatus   string `yaml:"binary_status"` // unverified | runtime-declared | adapter-ready | builtin | disabled
+	Migration      string `yaml:"migration"`     // preserved | runtime-declared | adapter-ready | pending
+	Notes          string `yaml:"notes,omitempty"`
+}
+
+// RuntimeManifest describes the family images that are built from the
+// repository's tool definitions. It is intentionally separate from the MCP
+// catalog: the catalog contains fixed adapters such as Nuclei/ZAP, while this
+// manifest maps the remaining compatible YAML tools to independently built
+// family runtimes.
+type RuntimeManifest struct {
+	SchemaVersion int                      `yaml:"schema_version"`
+	Name          string                   `yaml:"name,omitempty"`
+	BaseImage     string                   `yaml:"base_image"`
+	Families      map[string]RuntimeFamily `yaml:"families"`
+}
+
+type RuntimeFamily struct {
+	Service        string `yaml:"service"`
+	ComposeProfile string `yaml:"compose_profile"`
+	Image          string `yaml:"image"`
+}
+
+func LoadRuntimeManifest(path string) (RuntimeManifest, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return RuntimeManifest{}, fmt.Errorf("read runtime manifest %q: %w", path, err)
+	}
+	var manifest RuntimeManifest
+	decoder := yaml.NewDecoder(strings.NewReader(string(data)))
+	decoder.KnownFields(true)
+	if err := decoder.Decode(&manifest); err != nil {
+		return RuntimeManifest{}, fmt.Errorf("decode runtime manifest %q: %w", path, err)
+	}
+	if manifest.SchemaVersion != 1 {
+		return RuntimeManifest{}, fmt.Errorf("runtime manifest schema_version must be 1, got %d", manifest.SchemaVersion)
+	}
+	if strings.TrimSpace(manifest.BaseImage) == "" {
+		return RuntimeManifest{}, errors.New("runtime manifest base_image is required")
+	}
+	if len(manifest.Families) == 0 {
+		return RuntimeManifest{}, errors.New("runtime manifest families must not be empty")
+	}
+	for family, entry := range manifest.Families {
+		if strings.TrimSpace(family) == "" || strings.TrimSpace(entry.Service) == "" || strings.TrimSpace(entry.ComposeProfile) == "" || strings.TrimSpace(entry.Image) == "" {
+			return RuntimeManifest{}, fmt.Errorf("runtime family %q must declare service, compose_profile and image", family)
+		}
+	}
+	return manifest, nil
 }
 
 // BuildInventory reads the same directory the application loads at runtime.
-// It deliberately does not infer binaries from a third-party image: a tool is
-// only marked containerized when an explicit adapter exists in the deployment
-// catalog.
+// Without a runtime manifest it deliberately does not infer binaries from a
+// third-party image. BuildInventoryWithRuntime adds only the explicit family
+// images declared by the repository.
 func BuildInventory(toolsDir string, catalog Catalog) (ToolInventory, error) {
+	return BuildInventoryWithRuntime(toolsDir, catalog, "")
+}
+
+// BuildInventoryWithRuntime is BuildInventory plus the family image mapping.
+// An empty runtimeManifestPath preserves the pre-runtime behavior used by
+// unit tests and by callers that only need the historical adapter catalog.
+func BuildInventoryWithRuntime(toolsDir string, catalog Catalog, runtimeManifestPath string) (ToolInventory, error) {
+	var runtimeManifest RuntimeManifest
+	var err error
+	if strings.TrimSpace(runtimeManifestPath) != "" {
+		runtimeManifest, err = LoadRuntimeManifest(runtimeManifestPath)
+		if err != nil {
+			return ToolInventory{}, err
+		}
+	}
 	entries, err := os.ReadDir(toolsDir)
 	if err != nil {
 		return ToolInventory{}, fmt.Errorf("read tool definitions: %w", err)
@@ -114,6 +178,18 @@ func BuildInventory(toolsDir string, catalog Catalog) (ToolInventory, error) {
 					entry.BinaryStatus = "adapter-ready"
 				}
 				entry.Notes = "已有独立工具平面适配器；工具 YAML 仍保留，保证原有名称和参数兼容。"
+			}
+		}
+		if !entry.Containerized && entry.Enabled && entry.Runtime != "builtin" && len(runtimeManifest.Families) > 0 {
+			if runtime, ok := runtimeManifest.Families[entry.Family]; ok {
+				entry.Layer = "tool-plane"
+				entry.Runtime = "family"
+				entry.Containerized = true
+				entry.RuntimeImage = runtime.Image
+				entry.RuntimeService = runtime.Service
+				entry.BinaryStatus = "runtime-declared"
+				entry.Migration = "runtime-declared"
+				entry.Notes = "由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。"
 			}
 		}
 		inventoryTools = append(inventoryTools, entry)

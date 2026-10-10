@@ -15,7 +15,11 @@ go run ./cmd/toolcatalog validate --compose "$ROOT/docker-compose.yml" "$CATALOG
 if [ -f "$INVENTORY" ]; then
   tmp_inventory=$(mktemp)
   trap 'rm -f "$tmp_inventory"' EXIT HUP INT TERM
-  go run ./cmd/toolcatalog inventory --tools-dir tools --catalog "$CATALOG" --output "$tmp_inventory" >/dev/null
+  go run ./cmd/toolcatalog inventory \
+    --tools-dir tools \
+    --catalog "$CATALOG" \
+    --runtime "$ROOT/runtime/families.yaml" \
+    --output "$tmp_inventory" >/dev/null
   if ! diff -u "$INVENTORY" "$tmp_inventory"; then
     echo "deploy/tools/inventory.yaml is stale; regenerate it with:" >&2
     echo "  go run ./cmd/toolcatalog inventory --tools-dir tools --catalog deploy/tools/catalog.yaml --output deploy/tools/inventory.yaml" >&2
@@ -50,6 +54,7 @@ fi
 
 if command -v docker >/dev/null 2>&1; then
   docker compose -f "$ROOT/docker-compose.yml" --env-file "$ENV_FILE" config --quiet
+  docker compose -f "$ROOT/docker-compose.runtime.yml" --env-file "$ENV_FILE" config --quiet
   if [ "${REQUIRE_IMAGE_DIGESTS:-0}" = "1" ]; then
     resolved=$(docker compose \
       -f "$ROOT/docker-compose.yml" \

@@ -93,3 +93,30 @@ description: missing
 		t.Fatalf("unexpected runtime statuses: %#v", statuses)
 	}
 }
+
+func TestCheckRuntimeFamilyFiltersDefinitions(t *testing.T) {
+	root := t.TempDir()
+	content := `name: nmap
+command: nmap
+enabled: true
+description: recon
+`
+	if err := os.WriteFile(filepath.Join(root, "nmap.yaml"), []byte(content), 0644); err != nil {
+		t.Fatal(err)
+	}
+	content = `name: checkov
+command: checkov
+enabled: true
+description: cloud
+`
+	if err := os.WriteFile(filepath.Join(root, "checkov.yaml"), []byte(content), 0644); err != nil {
+		t.Fatal(err)
+	}
+	checks, err := CheckRuntimeFamily(root, false, "recon")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(checks) != 1 || checks[0].ID != "nmap" {
+		t.Fatalf("unexpected family checks: %#v", checks)
+	}
+}

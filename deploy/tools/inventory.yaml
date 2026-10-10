@@ -8,101 +8,128 @@ tools:
       source: tools/amass.yaml
       command: amass
       enabled: true
-      layer: control
+      layer: tool-plane
       family: recon
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:recon
+      runtime_service: runtime-recon-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: angr
       source: tools/angr.yaml
       command: python3
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: api-schema-analyzer
       source: tools/api-schema-analyzer.yaml
       command: spectral
       enabled: true
-      layer: control
+      layer: tool-plane
       family: utility
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:utility
+      runtime_service: runtime-utility-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: arjun
       source: tools/arjun.yaml
       command: arjun
       enabled: true
-      layer: control
+      layer: tool-plane
       family: web
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:web
+      runtime_service: runtime-web-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: arp-scan
       source: tools/arp-scan.yaml
       command: arp-scan
       enabled: true
-      layer: control
+      layer: tool-plane
       family: recon
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:recon
+      runtime_service: runtime-recon-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: binwalk
       source: tools/binwalk.yaml
       command: binwalk
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: bloodhound
       source: tools/bloodhound.yaml
       command: bloodhound-python
       enabled: true
-      layer: control
+      layer: tool-plane
       family: identity
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:identity
+      runtime_service: runtime-identity-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: checkov
       source: tools/checkov.yaml
       command: checkov
       enabled: true
-      layer: control
+      layer: tool-plane
       family: cloud
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:cloud
+      runtime_service: runtime-cloud-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: checksec
       source: tools/checksec.yaml
       command: checksec
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: clair
       source: tools/clair.yaml
       command: clair
@@ -118,79 +145,100 @@ tools:
       source: tools/cloudmapper.yaml
       command: cloudmapper
       enabled: true
-      layer: control
+      layer: tool-plane
       family: cloud
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:cloud
+      runtime_service: runtime-cloud-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: dalfox
       source: tools/dalfox.yaml
       command: dalfox
       enabled: true
-      layer: control
+      layer: tool-plane
       family: web
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:web
+      runtime_service: runtime-web-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: dirsearch
       source: tools/dirsearch.yaml
       command: dirsearch
       enabled: true
-      layer: control
+      layer: tool-plane
       family: web
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:web
+      runtime_service: runtime-web-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: dnsenum
       source: tools/dnsenum.yaml
       command: dnsenum
       enabled: true
-      layer: control
+      layer: tool-plane
       family: recon
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:recon
+      runtime_service: runtime-recon-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: dnslog
       source: tools/dnslog.yaml
       command: python3
       enabled: true
-      layer: control
+      layer: tool-plane
       family: external-intel
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:external-intel
+      runtime_service: runtime-external-intel-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: dotdotpwn
       source: tools/dotdotpwn.yaml
       command: dotdotpwn
       enabled: true
-      layer: control
+      layer: tool-plane
       family: web
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:web
+      runtime_service: runtime-web-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: enum4linux-ng
       source: tools/enum4linux-ng.yaml
       command: enum4linux-ng
       enabled: true
-      layer: control
+      layer: tool-plane
       family: identity
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:identity
+      runtime_service: runtime-identity-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: exec
       source: tools/exec.yaml
       command: sh
@@ -217,24 +265,30 @@ tools:
       source: tools/exiftool.yaml
       command: exiftool
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: falco
       source: tools/falco.yaml
       command: falco
       enabled: true
-      layer: control
+      layer: tool-plane
       family: cloud
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:cloud
+      runtime_service: runtime-cloud-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: feroxbuster
       source: tools/feroxbuster.yaml
       command: feroxbuster
@@ -250,24 +304,30 @@ tools:
       source: tools/ffuf.yaml
       command: ffuf
       enabled: true
-      layer: control
+      layer: tool-plane
       family: web
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:web
+      runtime_service: runtime-web-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: fierce
       source: tools/fierce.yaml
       command: fierce
       enabled: true
-      layer: control
+      layer: tool-plane
       family: recon
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:recon
+      runtime_service: runtime-recon-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: fofa_search
       source: tools/fofa_search.yaml
       command: python3
@@ -283,13 +343,16 @@ tools:
       source: tools/foremost.yaml
       command: foremost
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: fscan
       source: tools/fscan.yaml
       command: fscan
@@ -305,35 +368,44 @@ tools:
       source: tools/gau.yaml
       command: gau
       enabled: true
-      layer: control
+      layer: tool-plane
       family: recon
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:recon
+      runtime_service: runtime-recon-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: gdb
       source: tools/gdb.yaml
       command: gdb
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: ghidra
       source: tools/ghidra.yaml
       command: analyzeHeadless
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: gobuster
       source: tools/gobuster.yaml
       command: gobuster
@@ -349,68 +421,86 @@ tools:
       source: tools/graphql-scanner.yaml
       command: graphqlmap
       enabled: true
-      layer: control
+      layer: tool-plane
       family: web
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:web
+      runtime_service: runtime-web-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: hashcat
       source: tools/hashcat.yaml
       command: hashcat
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: hashpump
       source: tools/hashpump.yaml
       command: hashpump
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: http-framework-test
       source: tools/http-framework-test.yaml
       command: python3
       enabled: true
-      layer: control
+      layer: tool-plane
       family: web
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:web
+      runtime_service: runtime-web-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: hydra
       source: tools/hydra.yaml
       command: hydra
       enabled: true
-      layer: control
+      layer: tool-plane
       family: identity
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:identity
+      runtime_service: runtime-identity-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: impacket
       source: tools/impacket.yaml
       command: python3
       enabled: true
-      layer: control
+      layer: tool-plane
       family: identity
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:identity
+      runtime_service: runtime-identity-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: install-python-package
       source: tools/install-python-package.yaml
       command: /bin/bash
@@ -426,79 +516,100 @@ tools:
       source: tools/jaeles.yaml
       command: jaeles
       enabled: true
-      layer: control
+      layer: tool-plane
       family: web
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:web
+      runtime_service: runtime-web-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: john
       source: tools/john.yaml
       command: john
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: jwt-analyzer
       source: tools/jwt-analyzer.yaml
       command: jwt_tool
       enabled: true
-      layer: control
+      layer: tool-plane
       family: web
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:web
+      runtime_service: runtime-web-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: katana
       source: tools/katana.yaml
       command: katana
       enabled: true
-      layer: control
+      layer: tool-plane
       family: recon
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:recon
+      runtime_service: runtime-recon-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: kube-bench
       source: tools/kube-bench.yaml
       command: kube-bench
       enabled: true
-      layer: control
+      layer: tool-plane
       family: cloud
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:cloud
+      runtime_service: runtime-cloud-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: kube-hunter
       source: tools/kube-hunter.yaml
       command: kube-hunter
       enabled: true
-      layer: control
+      layer: tool-plane
       family: cloud
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:cloud
+      runtime_service: runtime-cloud-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: libc-database
       source: tools/libc-database.yaml
       command: python3
       enabled: true
-      layer: control
+      layer: tool-plane
       family: utility
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:utility
+      runtime_service: runtime-utility-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: lightx
       source: tools/lightx.yaml
       command: lightx
@@ -514,90 +625,114 @@ tools:
       source: tools/linpeas.yaml
       command: linpeas.sh
       enabled: true
-      layer: control
+      layer: tool-plane
       family: exploitation
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:exploitation
+      runtime_service: runtime-exploitation-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: masscan
       source: tools/masscan.yaml
       command: masscan
       enabled: true
-      layer: control
+      layer: tool-plane
       family: recon
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:recon
+      runtime_service: runtime-recon-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: metasploit
       source: tools/metasploit.yaml
       command: python3
       enabled: true
-      layer: control
+      layer: tool-plane
       family: exploitation
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:exploitation
+      runtime_service: runtime-exploitation-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: msfvenom
       source: tools/msfvenom.yaml
       command: msfvenom
       enabled: true
-      layer: control
+      layer: tool-plane
       family: exploitation
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:exploitation
+      runtime_service: runtime-exploitation-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: nbtscan
       source: tools/nbtscan.yaml
       command: nbtscan
       enabled: true
-      layer: control
+      layer: tool-plane
       family: recon
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:recon
+      runtime_service: runtime-recon-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: netexec
       source: tools/netexec.yaml
       command: netexec
       enabled: true
-      layer: control
+      layer: tool-plane
       family: identity
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:identity
+      runtime_service: runtime-identity-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: nikto
       source: tools/nikto.yaml
       command: nikto
       enabled: true
-      layer: control
+      layer: tool-plane
       family: web
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:web
+      runtime_service: runtime-web-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: nmap
       source: tools/nmap.yaml
       command: nmap
       enabled: true
-      layer: control
+      layer: tool-plane
       family: recon
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:recon
+      runtime_service: runtime-recon-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: nuclei
       source: tools/nuclei.yaml
       command: nuclei
@@ -615,24 +750,30 @@ tools:
       source: tools/objdump.yaml
       command: objdump
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: one-gadget
       source: tools/one-gadget.yaml
       command: one_gadget
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: pacu
       source: tools/pacu.yaml
       command: pacu
@@ -648,46 +789,58 @@ tools:
       source: tools/paramspider.yaml
       command: paramspider
       enabled: true
-      layer: control
+      layer: tool-plane
       family: web
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:web
+      runtime_service: runtime-web-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: prowler
       source: tools/prowler.yaml
       command: prowler
       enabled: true
-      layer: control
+      layer: tool-plane
       family: cloud
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:cloud
+      runtime_service: runtime-cloud-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: pwninit
       source: tools/pwninit.yaml
       command: pwninit
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: pwntools
       source: tools/pwntools.yaml
       command: python3
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: quake_search
       source: tools/quake_search.yaml
       command: python3
@@ -715,79 +868,100 @@ tools:
       source: tools/radare2.yaml
       command: r2
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: responder
       source: tools/responder.yaml
       command: python3
       enabled: true
-      layer: control
+      layer: tool-plane
       family: identity
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:identity
+      runtime_service: runtime-identity-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: ropgadget
       source: tools/ropgadget.yaml
       command: ROPgadget
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: ropper
       source: tools/ropper.yaml
       command: ropper
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: rpcclient
       source: tools/rpcclient.yaml
       command: python3
       enabled: true
-      layer: control
+      layer: tool-plane
       family: identity
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:identity
+      runtime_service: runtime-identity-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: rustscan
       source: tools/rustscan.yaml
       command: rustscan
       enabled: true
-      layer: control
+      layer: tool-plane
       family: recon
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:recon
+      runtime_service: runtime-recon-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: scout-suite
       source: tools/scout-suite.yaml
       command: scout
       enabled: true
-      layer: control
+      layer: tool-plane
       family: cloud
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:cloud
+      runtime_service: runtime-cloud-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: shodan_search
       source: tools/shodan_search.yaml
       command: python3
@@ -803,79 +977,100 @@ tools:
       source: tools/smbmap.yaml
       command: smbmap
       enabled: true
-      layer: control
+      layer: tool-plane
       family: identity
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:identity
+      runtime_service: runtime-identity-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: sqlmap
       source: tools/sqlmap.yaml
       command: sqlmap
       enabled: true
-      layer: control
+      layer: tool-plane
       family: web
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:web
+      runtime_service: runtime-web-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: steghide
       source: tools/steghide.yaml
       command: steghide
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: strings
       source: tools/strings.yaml
       command: strings
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: subfinder
       source: tools/subfinder.yaml
       command: subfinder
       enabled: true
-      layer: control
+      layer: tool-plane
       family: recon
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:recon
+      runtime_service: runtime-recon-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: terrascan
       source: tools/terrascan.yaml
       command: terrascan
       enabled: true
-      layer: control
+      layer: tool-plane
       family: cloud
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:cloud
+      runtime_service: runtime-cloud-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: trivy
       source: tools/trivy.yaml
       command: trivy
       enabled: true
-      layer: control
+      layer: tool-plane
       family: cloud
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:cloud
+      runtime_service: runtime-cloud-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: virustotal_search
       source: tools/virustotal_search.yaml
       command: python3
@@ -891,79 +1086,100 @@ tools:
       source: tools/volatility3.yaml
       command: volatility3
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: wafw00f
       source: tools/wafw00f.yaml
       command: wafw00f
       enabled: true
-      layer: control
+      layer: tool-plane
       family: web
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:web
+      runtime_service: runtime-web-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: waybackurls
       source: tools/waybackurls.yaml
       command: waybackurls
       enabled: true
-      layer: control
+      layer: tool-plane
       family: recon
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:recon
+      runtime_service: runtime-recon-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: wpscan
       source: tools/wpscan.yaml
       command: wpscan
       enabled: true
-      layer: control
+      layer: tool-plane
       family: web
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:web
+      runtime_service: runtime-web-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: x8
       source: tools/x8.yaml
       command: x8
       enabled: true
-      layer: control
+      layer: tool-plane
       family: web
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:web
+      runtime_service: runtime-web-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: xsser
       source: tools/xsser.yaml
       command: xsser
       enabled: true
-      layer: control
+      layer: tool-plane
       family: web
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:web
+      runtime_service: runtime-web-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: xxd
       source: tools/xxd.yaml
       command: xxd
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。
     - id: zap
       source: tools/zap.yaml
       command: zap-cli
@@ -992,10 +1208,13 @@ tools:
       source: tools/zsteg.yaml
       command: zsteg
       enabled: true
-      layer: control
+      layer: tool-plane
       family: binary-forensics
-      runtime: native
-      containerized: false
+      runtime: family
+      containerized: true
+      runtime_image: cyberstrike-tool-runtime:binary-forensics
+      runtime_service: runtime-binary-mcp
       availability: enabled
-      binary_status: unverified
-      migration: preserved
+      binary_status: runtime-declared
+      migration: runtime-declared
+      notes: 由独立工具族运行时提供；镜像构建阶段使用 toolcatalog doctor 逐项验收命令。

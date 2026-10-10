@@ -20,12 +20,24 @@ type ToolCheck struct {
 // CheckRuntime verifies the executable side of tools/*.yaml in the current
 // runtime. It intentionally does not mutate the host or install packages.
 func CheckRuntime(toolsDir string, includeDisabled bool) ([]ToolCheck, error) {
+	return CheckRuntimeFamily(toolsDir, includeDisabled, "")
+}
+
+// CheckRuntimeFamily is the family-scoped variant used by the independent
+// runtime images.  Keeping the filter here means the image build and the
+// repository inventory use the same family classification instead of carrying
+// a second hand-maintained command list in shell.
+func CheckRuntimeFamily(toolsDir string, includeDisabled bool, family string) ([]ToolCheck, error) {
 	tools, err := config.LoadToolsFromDir(toolsDir)
 	if err != nil {
 		return nil, fmt.Errorf("load tool definitions: %w", err)
 	}
+	family = strings.ToLower(strings.TrimSpace(family))
 	checks := make([]ToolCheck, 0, len(tools))
 	for _, tool := range tools {
+		if family != "" && ClassifyToolFamily(tool.Name, tool.Command) != family {
+			continue
+		}
 		check := ToolCheck{ID: tool.Name, Command: tool.Command}
 		if strings.HasPrefix(strings.TrimSpace(tool.Command), "internal:") {
 			check.Status = "builtin"

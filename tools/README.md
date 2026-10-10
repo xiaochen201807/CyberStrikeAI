@@ -51,15 +51,17 @@
 因此不能用一个只包含少数扫描器的镜像或 Compose 文件替换它。工具二进制是否已经迁移到独立
 工具平面，以 [`deploy/tools/inventory.yaml`](../deploy/tools/inventory.yaml) 为准：
 
-- `native`：保持原有控制平面执行契约；需要在受管运行时安装对应命令。
+- `family`：由 `deploy/tools/runtime/` 构建的独立工具族镜像提供，镜像内包含该族全部启用命令。
 - `external-adapter`：已经有独立工具平面适配器，并保留原 YAML 定义作为兼容注册。
+- `native`：仅保留给控制平面能力或尚未迁移的定义，需要在受管运行时安装对应命令。
 - `builtin`：由控制平面内部实现，不能作为普通外部命令迁移。
 
-`availability: enabled` 只表示定义启用；实际二进制状态看 `binary_status`。`unverified` 仍需在
-具体运行时中用 `command -v` 和最小安全参数完成验收。
+`availability: enabled` 只表示定义启用；实际二进制状态看 `binary_status`。`runtime-declared` 表示
+已经有族镜像配方，族镜像构建阶段会用 `toolcatalog doctor --strict` 验收；`adapter-ready` 和
+`builtin` 表示已有固定适配器或控制平面内置实现。
 
-新增工具时先添加 YAML 定义，再运行 `toolcatalog inventory` 更新部署清单。没有镜像、参数
-适配器、目标边界和结果回写契约时，不要把工具标记为已容器化。
+新增工具时先添加 YAML 定义，再把它归入一个运行时族并补充安装配方，随后运行 `toolcatalog inventory`
+更新部署清单。没有镜像、参数适配器、目标边界和结果回写契约时，不要把工具标记为已容器化。
 
 ## 参数定义
 

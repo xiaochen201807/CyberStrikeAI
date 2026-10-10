@@ -1,0 +1,184 @@
+name: ${RUNTIME_COMPOSE_PROJECT:-cyberstrike-tool-runtime}
+
+# This file is intentionally separate from the control plane and from the
+# small Nuclei/ZAP job file.  Each service builds exactly one tool family
+# image. Enable only the families required by a project.
+
+x-runtime-build: &runtime-build
+  context: ../..
+  dockerfile: deploy/tools/services/family-mcp/Dockerfile
+  args:
+    TOOL_BASE_IMAGE: ${TOOL_BASE_IMAGE:-kalilinux/kali-rolling@sha256:c717f201f29a7e0a9126c0d51bd08aa7194ac82f53c57314339182f92b0b1585}
+
+x-runtime-common: &runtime-common
+  init: true
+  environment: &runtime-environment
+    TOOL_DEFINITIONS_DIR: /etc/cyberstrike/tools
+    TOOL_CATALOG: /etc/cyberstrike/catalog.yaml
+    TOOL_MCP_LISTEN: :8080
+    TOOL_MCP_TOKEN: ${TOOL_MCP_TOKEN:-}
+    TOOL_MCP_AUTH_HEADER: ${TOOL_MCP_AUTH_HEADER:-X-Tool-Token}
+    TOOL_ALLOWED_HOSTS: ${TOOL_ALLOWED_HOSTS:-}
+    TOOL_PRECHECK: ${TOOL_PRECHECK:-1}
+    TOOL_WORKDIR: /workspace
+    REPORTS_DIR: /reports
+    REPORT_REFERENCE_ROOT: /app/tool_reports
+    HOME: /tmp
+  expose: ["8080"]
+  volumes:
+    - ${TOOL_WORKSPACE_DIR:-./data/workspace}:/workspace:rw
+    - ${REPORTS_DIR:-./data/reports}:/reports:rw
+  read_only: true
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,size=512m
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  mem_limit: ${RUNTIME_MEMORY_LIMIT:-3g}
+  cpus: ${RUNTIME_CPUS:-3}
+  pids_limit: ${RUNTIME_PIDS_LIMIT:-384}
+  networks: [control, egress]
+  restart: unless-stopped
+  healthcheck:
+    test: ["CMD", "/usr/local/bin/tool-mcp", "-probe"]
+    interval: 30s
+    timeout: 5s
+    start_period: 30s
+    retries: 3
+
+services:
+  runtime-recon-mcp:
+    <<: *runtime-common
+    profiles: ["runtime-recon"]
+    image: ${RECON_IMAGE:-cyberstrike-tool-runtime:recon}
+    build:
+      <<: *runtime-build
+      args:
+        TOOL_BASE_IMAGE: ${TOOL_BASE_IMAGE:-kalilinux/kali-rolling@sha256:c717f201f29a7e0a9126c0d51bd08aa7194ac82f53c57314339182f92b0b1585}
+        TOOL_FAMILY: recon
+    environment:
+      <<: *runtime-environment
+      TOOL_FAMILY: recon
+      TOOL_MCP_SERVICE: runtime-recon-mcp
+      TOOL_MCP_ENDPOINT: http://runtime-recon-mcp:8080/sse
+      TOOL_RUNTIME_IMAGE: ${RECON_IMAGE:-cyberstrike-tool-runtime:recon}
+
+  runtime-web-mcp:
+    <<: *runtime-common
+    profiles: ["runtime-web"]
+    image: ${WEB_IMAGE:-cyberstrike-tool-runtime:web}
+    build:
+      <<: *runtime-build
+      args:
+        TOOL_BASE_IMAGE: ${TOOL_BASE_IMAGE:-kalilinux/kali-rolling@sha256:c717f201f29a7e0a9126c0d51bd08aa7194ac82f53c57314339182f92b0b1585}
+        TOOL_FAMILY: web
+    environment:
+      <<: *runtime-environment
+      TOOL_FAMILY: web
+      TOOL_MCP_SERVICE: runtime-web-mcp
+      TOOL_MCP_ENDPOINT: http://runtime-web-mcp:8080/sse
+      TOOL_RUNTIME_IMAGE: ${WEB_IMAGE:-cyberstrike-tool-runtime:web}
+
+  runtime-identity-mcp:
+    <<: *runtime-common
+    profiles: ["runtime-identity"]
+    image: ${IDENTITY_IMAGE:-cyberstrike-tool-runtime:identity}
+    build:
+      <<: *runtime-build
+      args:
+        TOOL_BASE_IMAGE: ${TOOL_BASE_IMAGE:-kalilinux/kali-rolling@sha256:c717f201f29a7e0a9126c0d51bd08aa7194ac82f53c57314339182f92b0b1585}
+        TOOL_FAMILY: identity
+    environment:
+      <<: *runtime-environment
+      TOOL_FAMILY: identity
+      TOOL_MCP_SERVICE: runtime-identity-mcp
+      TOOL_MCP_ENDPOINT: http://runtime-identity-mcp:8080/sse
+      TOOL_RUNTIME_IMAGE: ${IDENTITY_IMAGE:-cyberstrike-tool-runtime:identity}
+
+  runtime-binary-mcp:
+    <<: *runtime-common
+    profiles: ["runtime-binary"]
+    image: ${BINARY_IMAGE:-cyberstrike-tool-runtime:binary-forensics}
+    build:
+      <<: *runtime-build
+      args:
+        TOOL_BASE_IMAGE: ${TOOL_BASE_IMAGE:-kalilinux/kali-rolling@sha256:c717f201f29a7e0a9126c0d51bd08aa7194ac82f53c57314339182f92b0b1585}
+        TOOL_FAMILY: binary-forensics
+    environment:
+      <<: *runtime-environment
+      TOOL_FAMILY: binary-forensics
+      TOOL_MCP_SERVICE: runtime-binary-mcp
+      TOOL_MCP_ENDPOINT: http://runtime-binary-mcp:8080/sse
+      TOOL_RUNTIME_IMAGE: ${BINARY_IMAGE:-cyberstrike-tool-runtime:binary-forensics}
+
+  runtime-cloud-mcp:
+    <<: *runtime-common
+    profiles: ["runtime-cloud"]
+    image: ${CLOUD_IMAGE:-cyberstrike-tool-runtime:cloud}
+    build:
+      <<: *runtime-build
+      args:
+        TOOL_BASE_IMAGE: ${TOOL_BASE_IMAGE:-kalilinux/kali-rolling@sha256:c717f201f29a7e0a9126c0d51bd08aa7194ac82f53c57314339182f92b0b1585}
+        TOOL_FAMILY: cloud
+    environment:
+      <<: *runtime-environment
+      TOOL_FAMILY: cloud
+      TOOL_MCP_SERVICE: runtime-cloud-mcp
+      TOOL_MCP_ENDPOINT: http://runtime-cloud-mcp:8080/sse
+      TOOL_RUNTIME_IMAGE: ${CLOUD_IMAGE:-cyberstrike-tool-runtime:cloud}
+
+  runtime-exploitation-mcp:
+    <<: *runtime-common
+    profiles: ["runtime-exploitation"]
+    image: ${EXPLOITATION_IMAGE:-cyberstrike-tool-runtime:exploitation}
+    build:
+      <<: *runtime-build
+      args:
+        TOOL_BASE_IMAGE: ${TOOL_BASE_IMAGE:-kalilinux/kali-rolling@sha256:c717f201f29a7e0a9126c0d51bd08aa7194ac82f53c57314339182f92b0b1585}
+        TOOL_FAMILY: exploitation
+    environment:
+      <<: *runtime-environment
+      TOOL_FAMILY: exploitation
+      TOOL_MCP_SERVICE: runtime-exploitation-mcp
+      TOOL_MCP_ENDPOINT: http://runtime-exploitation-mcp:8080/sse
+      TOOL_RUNTIME_IMAGE: ${EXPLOITATION_IMAGE:-cyberstrike-tool-runtime:exploitation}
+
+  runtime-external-intel-mcp:
+    <<: *runtime-common
+    profiles: ["runtime-external-intel"]
+    image: ${EXTERNAL_INTEL_IMAGE:-cyberstrike-tool-runtime:external-intel}
+    build:
+      <<: *runtime-build
+      args:
+        TOOL_BASE_IMAGE: ${TOOL_BASE_IMAGE:-kalilinux/kali-rolling@sha256:c717f201f29a7e0a9126c0d51bd08aa7194ac82f53c57314339182f92b0b1585}
+        TOOL_FAMILY: external-intel
+    environment:
+      <<: *runtime-environment
+      TOOL_FAMILY: external-intel
+      TOOL_MCP_SERVICE: runtime-external-intel-mcp
+      TOOL_MCP_ENDPOINT: http://runtime-external-intel-mcp:8080/sse
+      TOOL_RUNTIME_IMAGE: ${EXTERNAL_INTEL_IMAGE:-cyberstrike-tool-runtime:external-intel}
+
+  runtime-utility-mcp:
+    <<: *runtime-common
+    profiles: ["runtime-utility"]
+    image: ${UTILITY_IMAGE:-cyberstrike-tool-runtime:utility}
+    build:
+      <<: *runtime-build
+      args:
+        TOOL_BASE_IMAGE: ${TOOL_BASE_IMAGE:-kalilinux/kali-rolling@sha256:c717f201f29a7e0a9126c0d51bd08aa7194ac82f53c57314339182f92b0b1585}
+        TOOL_FAMILY: utility
+    environment:
+      <<: *runtime-environment
+      TOOL_FAMILY: utility
+      TOOL_MCP_SERVICE: runtime-utility-mcp
+      TOOL_MCP_ENDPOINT: http://runtime-utility-mcp:8080/sse
+      TOOL_RUNTIME_IMAGE: ${UTILITY_IMAGE:-cyberstrike-tool-runtime:utility}
+
+networks:
+  control:
+    external: true
+    name: ${CYBERSTRIKE_CONTROL_NETWORK:-cyberstrike-control}
+  egress:
+    name: ${TOOLS_EGRESS_NETWORK:-cyberstrike-tools-egress}

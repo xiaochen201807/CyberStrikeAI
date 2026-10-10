@@ -31,8 +31,8 @@ https://127.0.0.1:8080/readyz
 
 `control` Compose 项目不挂载 Docker Socket，也不直接启动 nmap、Nuclei、ZAP 等扫描器。
 控制平面镜像和只读注册表挂载会保留仓库里的完整 `tools/*.yaml` 定义，保证当前项目的工具名称、参数
-和角色兼容性不丢失；命令二进制由受管运行时或工具平面的外部 MCP 提供。当前独立适配器覆盖
-Nuclei/ZAP，其余工具状态见 `deploy/tools/inventory.yaml`，不会被假装成已容器化。
+和角色兼容性不丢失；命令二进制由受管运行时或工具平面的外部 MCP 提供。独立工具平面现在覆盖
+Nuclei/ZAP 适配器和 8 个工具族运行时，其余控制平面能力及禁用项状态见 `deploy/tools/inventory.yaml`。
 
 ## 持久化卷
 

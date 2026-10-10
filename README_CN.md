@@ -231,13 +231,15 @@ chmod +x run.sh && ./run.sh
      ```
    - 或启动前直接编辑 `config.yaml` 文件。`ai.default_channel` 会作为新对话和未显式选择通道任务的默认模型；对话页也可以在会话设置里选择某个已保存通道。
 2. **登录系统** - 首次启动时控制台会显示自动生成的 `admin` 初始密码；也可在「平台权限 → 用户管理」中创建账号
-3. **准备安全工具** - 项目现有 90 个 `tools/*.yaml` 定义（78 个默认启用、12 个默认禁用）会随控制平面加载，保证原有工具名称和参数不丢失。推荐使用独立的 [Docker 工具平面](docs/zh-CN/tool-plane.md)逐步承载扫描器二进制；当前已提供 Nuclei/ZAP 适配器，其余工具必须按清单迁移或在受管主机上安装对应命令。未安装的命令会在调用时返回明确错误，不会被假装成已容器化。常用示例：
+3. **准备安全工具** - 项目现有 90 个 `tools/*.yaml` 定义（78 个默认启用、12 个默认禁用）会随控制平面加载，保证原有工具名称和参数不丢失。推荐使用独立的 [Docker 工具平面](docs/zh-CN/tool-plane.md)：当前提供 Nuclei/ZAP 固定适配器，以及 8 个按工具族拆分的运行时镜像；每个镜像构建阶段都会严格检查该族启用命令。3 个控制平面 Shell 能力和 12 个禁用定义不会被错误打包。常用示例：
 
    **独立 Docker 工具平面（推荐）：**
    ```bash
    cd deploy/tools
    cp .env.example .env
    ./scripts/validate.sh
+   docker compose -f docker-compose.runtime.yml --env-file .env \
+     --profile runtime-recon --profile runtime-web up -d --build
    # 将已授权 URL 写入 data/targets/targets.txt 后执行
    docker compose --profile web-job run --rm nuclei-scan
    ```

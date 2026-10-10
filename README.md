@@ -232,7 +232,7 @@ The `run.sh` script will automatically:
      ```
    - Or edit `config.yaml` directly before launching. `ai.default_channel` is used for new conversations and tasks that do not explicitly select a channel; the chat page can also select any saved channel per session.
 2. **Login** - On first startup the console prints an auto-generated initial `admin` password; create accounts from **Platform permissions → User management**
-3. **Prepare security tools** - The control plane keeps all 90 `tools/*.yaml` definitions and their schemas. Install the corresponding command in a managed runtime or use the independent [Docker tool plane](docs/zh-CN/tool-plane.md); missing binaries return an explicit execution error and are not silently presented as containerized. Common examples:
+3. **Prepare security tools** - The control plane keeps all 90 `tools/*.yaml` definitions and their schemas. The independent [Docker tool plane](docs/zh-CN/tool-plane.md) now provides fixed Nuclei/ZAP adapters plus eight independently built family runtimes; each family image runs a strict command check during its build. Control-plane shell helpers and disabled definitions remain outside scanner images.
 
    **macOS (Homebrew):**
    ```bash

@@ -2,13 +2,14 @@
 
 CyberStrikeAI 的 Web/API 控制平面和安全工具平面应分开部署。控制平面镜像包含完整的
 `tools/*.yaml` 工具注册表（名称、参数、描述和角色兼容性），但不把 nmap、Nuclei、ZAP、
-sqlmap 等扫描器二进制塞进控制镜像；二进制由 `deploy/tools/docker-compose.yml` 或受管主机运行时提供。
+sqlmap 等扫描器二进制塞进控制镜像；二进制由 `deploy/tools/docker-compose.yml`、
+`deploy/tools/docker-compose.runtime.yml` 或受管主机运行时提供。
 
 当前仓库工具清单以 `tools/*.yaml` 为准，共 90 个定义，其中 78 个启用、12 个禁用。完整
-部署状态见 [`deploy/tools/inventory.yaml`](../../deploy/tools/inventory.yaml)。目前只有 Nuclei/ZAP
-有独立的工具平面适配器；其余工具仍通过原有控制平面执行路径保持兼容，尚未被错误地标成已容器化。
-其中 `binary_status: unverified` 只表示 YAML 定义启用，不能代替运行时内的 `command -v` 验收；
-只有 `adapter-ready` 或 `builtin` 才表示本清单已经有可验证的执行路径。
+部署状态见 [`deploy/tools/inventory.yaml`](../../deploy/tools/inventory.yaml)。73 个可迁移工具已经
+映射到 8 个独立工具族镜像；Nuclei/ZAP 仍使用固定的专用适配器；3 个控制平面 Shell 能力和 1 个
+内部工具不会迁移到外部运行时。镜像构建阶段会对每个族执行严格 `toolcatalog doctor`，因此
+`runtime-declared` 表示已有明确构建配方，CI 通过后再视为已验证执行路径。
 
 工具定义发生变化后重新生成清单：
 
@@ -16,6 +17,7 @@ sqlmap 等扫描器二进制塞进控制镜像；二进制由 `deploy/tools/dock
 go run ./cmd/toolcatalog inventory \
   --tools-dir tools \
   --catalog deploy/tools/catalog.yaml \
+  --runtime deploy/tools/runtime/families.yaml \
   --output deploy/tools/inventory.yaml
 ```
 
@@ -45,7 +47,7 @@ go run ./cmd/toolcatalog validate --compose deploy/tools/docker-compose.yml depl
 进行严格校验。CI/生产环境可以增加 `--require-digests`，禁止只使用版本标签。
 其中 `profile` 表示逻辑工具族，`compose_profile` 将长驻 MCP 和一次性任务分开。
 
-## 两个 Compose 项目
+## 三个 Compose 文件
 
 ```bash
 cd deploy/control
@@ -84,6 +86,18 @@ external_mcp:
 
 ZAP 对应 `http://zap-mcp:8080/sse` 和 `zap_baseline` 工具。工具服务不发布宿主机端口，控制平面
 通过 `cyberstrike-control` 内部网络访问。
+
+工具族运行时使用单独的 Compose 文件，按需启用，不会把 73 个工具塞进控制平面或一个通用大镜像：
+
+```bash
+cd deploy/tools
+docker compose -f docker-compose.runtime.yml --env-file .env \
+  --profile runtime-recon --profile runtime-web up -d --build
+```
+
+每个族服务只选择对应 `TOOL_FAMILY` 的工具定义。运行时安装脚本位于
+[`deploy/tools/runtime/install-family.sh`](../../deploy/tools/runtime/install-family.sh)，族映射位于
+[`deploy/tools/runtime/families.yaml`](../../deploy/tools/runtime/families.yaml)。
 
 每个 MCP 工具服务还必须配置 `TOOL_ALLOWED_HOSTS`。它只允许精确主机或限定子域名模式，拒绝空列表
 和全局通配符；建议每个 Compose 项目对应一个授权测试范围。这个检查不能替代 CyberStrikeAI 的项目

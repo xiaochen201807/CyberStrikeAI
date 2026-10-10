@@ -34,7 +34,7 @@ apt_install_available() {
 
 pip_install_optional() {
   for package in "$@"; do
-    if python3 -m pip install --break-system-packages --no-cache-dir "$package"; then
+    if "$python_venv/bin/pip" install --no-cache-dir "$package"; then
       continue
     fi
     echo "pip package failed to install: $package" >&2
@@ -99,6 +99,15 @@ apt_install_available \
   build-essential pkg-config libffi-dev libssl-dev libpcap-dev \
   ruby ruby-dev npm nodejs golang-go cargo rustc binutils gnupg
 
+# Keep Python tooling out of the distribution-managed site-packages tree.  A
+# number of security tools depend on newer packaging metadata than Kali ships;
+# installing them in a dedicated venv avoids pip trying to uninstall apt-owned
+# files while keeping their console entry points on PATH at runtime.
+python_venv=/opt/cyberstrike-venv
+python3 -m venv "$python_venv"
+"$python_venv/bin/pip" install --no-cache-dir --upgrade pip setuptools wheel
+export PATH="$python_venv/bin:$PATH"
+
 case "$family" in
   recon)
     apt_install_available \
@@ -108,23 +117,29 @@ case "$family" in
     # every Kali snapshot.  Pin versions so a rebuild does not silently float.
     go_install_pinned github.com/lc/gau/v2/cmd/gau v2.2.4
     go_install_pinned github.com/tomnomnom/waybackurls v0.1.0
+    go_install_pinned github.com/projectdiscovery/katana/cmd/katana v1.4.0
     ;;
   web)
     apt_install_available \
       arjun dalfox dirsearch dotdotpwn ffuf gobuster graphqlmap nikto nuclei \
       paramspider sqlmap wafw00f wpscan xsser zaproxy
     git clone --depth 1 https://github.com/ticarpi/jwt_tool.git /opt/jwt_tool
-    python3 -m pip install --break-system-packages --no-cache-dir -r /opt/jwt_tool/requirements.txt
+    "$python_venv/bin/pip" install --no-cache-dir -r /opt/jwt_tool/requirements.txt
     cat > /usr/local/bin/jwt_tool <<'EOF'
 #!/bin/sh
-exec python3 /opt/jwt_tool/jwt_tool.py "$@"
+exec /opt/cyberstrike-venv/bin/python /opt/jwt_tool/jwt_tool.py "$@"
 EOF
     chmod 0755 /usr/local/bin/jwt_tool
     git clone --depth 1 https://github.com/swisskyrepo/GraphQLmap.git /opt/graphqlmap
-    python3 -m pip install --break-system-packages --no-cache-dir -r /opt/graphqlmap/requirements.txt
+    # GraphQLmap's historical `readline` pin does not build on Python 3.14;
+    # GNU readline is already provided by the base image and is not needed as
+    # a Python dependency for its non-interactive MCP invocation.
+    grep -Ev '^[[:space:]]*readline([<=>].*)?$' /opt/graphqlmap/requirements.txt \
+      > /tmp/graphqlmap-requirements.txt
+    "$python_venv/bin/pip" install --no-cache-dir -r /tmp/graphqlmap-requirements.txt
     cat > /usr/local/bin/graphqlmap <<'EOF'
 #!/bin/sh
-exec python3 /opt/graphqlmap/bin/graphqlmap "$@"
+exec /opt/cyberstrike-venv/bin/python /opt/graphqlmap/bin/graphqlmap "$@"
 EOF
     chmod 0755 /usr/local/bin/graphqlmap
     cargo install --root /usr/local --locked --version 4.3.2 x8
@@ -142,7 +157,8 @@ EOF
   binary-forensics)
     apt_install_available \
       binwalk checksec libimage-exiftool-perl foremost gdb ghidra hashcat \
-      john radare2 ropper steghide xxd python3-pwntools python3-capstone
+      john radare2 ropper steghide xxd python3-pwntools python3-capstone \
+      liblzma-dev
     pip_install_optional angr volatility3 ROPGadget==7.6
     gem_install_optional one_gadget zsteg
     cargo install --root /usr/local --locked --version 3.3.3 pwninit
@@ -199,10 +215,10 @@ EOF
     # upstream checkout when a distribution is unavailable.
     if ! command -v cloudmapper >/dev/null 2>&1; then
       git clone --depth 1 https://github.com/duo-labs/cloudmapper.git /opt/cloudmapper
-      python3 -m pip install --break-system-packages --no-cache-dir -r /opt/cloudmapper/requirements.txt
+      "$python_venv/bin/pip" install --no-cache-dir -r /opt/cloudmapper/requirements.txt
       cat > /usr/local/bin/cloudmapper <<'EOF'
 #!/bin/sh
-exec python3 /opt/cloudmapper/cloudmapper.py "$@"
+exec /opt/cyberstrike-venv/bin/python /opt/cloudmapper/cloudmapper.py "$@"
 EOF
       chmod 0755 /usr/local/bin/cloudmapper
     fi

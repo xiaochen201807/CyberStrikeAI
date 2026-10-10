@@ -24,6 +24,7 @@ ENV TOOL_DEFINITIONS_DIR=/etc/cyberstrike/tools
 ENV TOOL_CATALOG=/etc/cyberstrike/catalog.yaml
 ENV TOOL_PRECHECK=1
 ENV HOME=/tmp
+ENV PATH=/opt/cyberstrike-venv/bin:$PATH
 
 COPY deploy/tools/runtime/install-family.sh /usr/local/sbin/install-family.sh
 RUN chmod 0755 /usr/local/sbin/install-family.sh \

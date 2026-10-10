@@ -134,7 +134,7 @@ EOF
     # GraphQLmap's historical `readline` pin does not build on Python 3.14;
     # GNU readline is already provided by the base image and is not needed as
     # a Python dependency for its non-interactive MCP invocation.
-    grep -Ev '^[[:space:]]*readline([<=>].*)?$' /opt/graphqlmap/requirements.txt \
+    grep -Ev '^[[:space:]]*(py)?readline([[:space:];<=>].*)?$' /opt/graphqlmap/requirements.txt \
       > /tmp/graphqlmap-requirements.txt
     "$python_venv/bin/pip" install --no-cache-dir -r /tmp/graphqlmap-requirements.txt
     cat > /usr/local/bin/graphqlmap <<'EOF'
@@ -182,7 +182,9 @@ EOF
     chmod 0755 /usr/local/bin/libc-database
     # Volatility3 publishes vol.py; CyberStrikeAI's YAML contract uses the
     # stable volatility3 command name.
-    if command -v vol.py >/dev/null 2>&1 && [ ! -e /usr/local/bin/volatility3 ]; then
+    if command -v vol >/dev/null 2>&1 && [ ! -e /usr/local/bin/volatility3 ]; then
+      ln -s "$(command -v vol)" /usr/local/bin/volatility3
+    elif command -v vol.py >/dev/null 2>&1 && [ ! -e /usr/local/bin/volatility3 ]; then
       ln -s "$(command -v vol.py)" /usr/local/bin/volatility3
     fi
     if ! command -v analyzeHeadless >/dev/null 2>&1; then
@@ -208,9 +210,12 @@ EOF
     FALCO_FRONTEND=noninteractive FALCO_DRIVER_CHOICE=none FALCOCTL_ENABLED=no \
       apt_install_available falco
     apt_install_available trivy awscli jq python3-tk autoconf automake libtool
+    # Prowler 5.x currently requires Python <3.14; Kali rolling ships 3.14.
+    # Keep the latest 3.x release that supports the image interpreter until
+    # the family base moves to a compatible Python runtime.
     pip_install_optional \
       checkov==3.3.26 kube-hunter==0.6.8 \
-      prowler==5.44.0 scoutsuite==5.14.0
+      prowler==3.11.3 scoutsuite==5.14.0
     # CloudMapper is not consistently published to PyPI; retain the pinned
     # upstream checkout when a distribution is unavailable.
     if ! command -v cloudmapper >/dev/null 2>&1; then

@@ -10,7 +10,7 @@
 
 CyberStrikeAI 将规划、执行、人工监督、证据与复盘连接在同一个可审计工作空间中。项目基于 Go 构建，融合 Eino 智能体、MCP 原生工具、RAG 知识、可视化工作流以及攻击链建模与分析能力，面向已获得明确授权的安全任务。
 
-**从这里开始：** [快速上手](#快速上手一条命令部署) · [Docker 工具平面](docs/zh-CN/tool-plane.md) · [中文文档](docs/zh-CN/README.md) · [安全加固](docs/zh-CN/security-hardening.md)
+**从这里开始：** [快速上手](#快速上手一条命令部署) · [平台部署边界](docs/zh-CN/platform-deployment.md) · [Docker 工具平面](docs/zh-CN/tool-plane.md) · [中文文档](docs/zh-CN/README.md) · [安全加固](docs/zh-CN/security-hardening.md)
 
 > [!IMPORTANT]
 > 仅可对自有系统或已获得明确授权的目标使用 CyberStrikeAI。在共享或生产环境启用高风险工具、WebShell 或 C2 前，请先阅读[安全模型](docs/zh-CN/security-model.md)和[安全加固指南](docs/zh-CN/security-hardening.md)。
@@ -191,7 +191,7 @@ CyberStrikeAI 将规划、执行、人工监督、证据与复盘连接在同一
 
 **一条命令部署：**
 ```bash
-git clone https://github.com/Ed1s0nZ/CyberStrikeAI.git
+git clone https://github.com/xiaochen201807/CyberStrikeAI.git
 cd CyberStrikeAI
 chmod +x run.sh && ./run.sh
 ```
@@ -333,7 +333,7 @@ ai:
 
 ## 相关文档
 
-- **新用户：** [部署指南](docs/zh-CN/deployment.md) → [Docker 工具平面](docs/zh-CN/tool-plane.md) → [配置参考](docs/zh-CN/configuration.md) → [排错指南](docs/zh-CN/troubleshooting.md)
+- **新用户：** [部署指南](docs/zh-CN/deployment.md) → [平台部署边界](docs/zh-CN/platform-deployment.md) → [Docker 工具平面](docs/zh-CN/tool-plane.md) → [配置参考](docs/zh-CN/configuration.md) → [排错指南](docs/zh-CN/troubleshooting.md)
 - **运维人员：** [配置画像](docs/zh-CN/configuration-profiles.md) → [安全加固](docs/zh-CN/security-hardening.md) → [运维 Runbooks](docs/zh-CN/runbooks.md)
 - **集成开发：** [API 参考](docs/zh-CN/api-reference.md) → [API Recipes](docs/zh-CN/api-recipes.md) → [MCP 联邦](docs/zh-CN/mcp-federation.md)
 - **项目贡献：** [开发者指南](docs/zh-CN/developer-guide.md) → [测试指南](docs/zh-CN/testing.md) → [贡献规范](docs/zh-CN/contributing-guide.md)

@@ -80,6 +80,18 @@ install_zip_binary() {
   chmod 0755 "$output"
 }
 
+install_gzip_binary() {
+  url=$1
+  output=$2
+  expected_sha256=$3
+  tmp=$(mktemp)
+  curl -fsSL --retry 3 --retry-delay 2 "$url" -o "$tmp"
+  printf '%s  %s\n' "$expected_sha256" "$tmp" | sha256sum -c -
+  gzip -dc "$tmp" > "$output"
+  chmod 0755 "$output"
+  rm -f "$tmp"
+}
+
 install_tar_binary() {
   url=$1
   member=$2
@@ -142,7 +154,13 @@ EOF
 exec /opt/cyberstrike-venv/bin/python /opt/graphqlmap/bin/graphqlmap "$@"
 EOF
     chmod 0755 /usr/local/bin/graphqlmap
-    cargo install --root /usr/local --locked --version 4.3.2 x8
+    # x8's Cargo dependency graph currently fails with the Rust compiler in
+    # the Kali rolling image.  Use the upstream amd64 release instead of
+    # making a Web image depend on an unstable source build.
+    install_gzip_binary \
+      https://github.com/Sh1Yo/x8/releases/download/v4.3.0/x86_64-linux-x8.gz \
+      /usr/local/bin/x8 \
+      b3e54da4c0cc62163a3485addea6671368ee69342ea5740e56d6d6112196bd0e
     # jaeles is distributed as a static release instead of a Go module.
     install_zip_binary \
       https://github.com/jaeles-project/jaeles/releases/download/beta-v0.17.1/jaeles-beta-v0.17.1-linux.zip \
@@ -213,19 +231,119 @@ EOF
     # Prowler 5.x currently requires Python <3.14; Kali rolling ships 3.14.
     # Keep the latest 3.x release that supports the image interpreter until
     # the family base moves to a compatible Python runtime.
-    pip_install_optional \
-      checkov==3.3.26 kube-hunter==0.6.8 \
-      prowler==3.11.3 scoutsuite==5.14.0
+    pip_install_optional checkov==3.3.26 kube-hunter==0.6.8
+    # Prowler and ScoutSuite pin overlapping cloud SDKs.  Keep them in their
+    # own virtual environments so installing one cannot silently break the
+    # other or Checkov at runtime.
+    prowler_venv=/opt/cyberstrike-prowler-venv
+    python3 -m venv "$prowler_venv"
+    "$prowler_venv/bin/pip" install --no-cache-dir --upgrade pip setuptools wheel
+    "$prowler_venv/bin/pip" install --no-cache-dir prowler==3.11.3
+    cat > /usr/local/bin/prowler <<'EOF'
+#!/bin/sh
+exec /opt/cyberstrike-prowler-venv/bin/prowler "$@"
+EOF
+    chmod 0755 /usr/local/bin/prowler
+    scout_venv=/opt/cyberstrike-scout-venv
+    python3 -m venv "$scout_venv"
+    "$scout_venv/bin/pip" install --no-cache-dir --upgrade pip setuptools wheel
+    "$scout_venv/bin/pip" install --no-cache-dir scoutsuite==5.14.0
+    cat > /usr/local/bin/scout <<'EOF'
+#!/bin/sh
+exec /opt/cyberstrike-scout-venv/bin/scout "$@"
+EOF
+    chmod 0755 /usr/local/bin/scout
     # CloudMapper is not consistently published to PyPI; retain the pinned
     # upstream checkout when a distribution is unavailable.
     if ! command -v cloudmapper >/dev/null 2>&1; then
       git clone --depth 1 https://github.com/duo-labs/cloudmapper.git /opt/cloudmapper
-      "$python_venv/bin/pip" install --no-cache-dir -r /opt/cloudmapper/requirements.txt
+      # The upstream requirements file contains development/lint pins from
+      # the Python 3.8 era (notably autoflake==1.4), which cannot build on the
+      # Python 3.14 interpreter in current Kali.  Install only CloudMapper's
+      # runtime imports in an isolated environment and provide a tiny pyjq
+      # compatibility module backed by the jq CLI already in the image.
+      cloudmapper_venv=/opt/cyberstrike-cloudmapper-venv
+      python3 -m venv "$cloudmapper_venv"
+      "$cloudmapper_venv/bin/pip" install --no-cache-dir --upgrade pip setuptools wheel
+      "$cloudmapper_venv/bin/pip" install --no-cache-dir \
+        'boto3>=1.26' 'Jinja2>=3.1' 'netaddr>=0.8' \
+        'parliament>=1.5' 'policyuniverse>=1.5' 'PyYAML>=6' 'six>=1.16'
+      cat > /opt/cloudmapper/pyjq.py <<'PY'
+import json
+import subprocess
+import urllib.request
+
+
+def _evaluate(program, value, vars=None):
+    command = ["jq", "-c"]
+    if vars:
+        for key, item in vars.items():
+            command.extend(["--argjson", key, json.dumps(item)])
+    command.append(program)
+    result = subprocess.run(
+        command,
+        input=json.dumps(value),
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    return [json.loads(line) for line in result.stdout.splitlines() if line]
+
+
+def all(program, value=None, vars=None, url=None, opener=None):
+    if url is not None:
+        reader = opener or urllib.request.urlopen
+        with reader(url) as response:
+            value = json.loads(response.read().decode("utf-8"))
+    return _evaluate(program, value, vars=vars)
+
+
+def first(program, value=None, default=None, vars=None, url=None, opener=None):
+    values = all(program, value, vars=vars, url=url, opener=opener)
+    return values[0] if values else default
+
+
+def one(program, value=None, vars=None, url=None, opener=None):
+    values = all(program, value, vars=vars, url=url, opener=opener)
+    if not values:
+        raise IndexError("Result of jq is empty")
+    if len(values) > 1:
+        raise IndexError("Result of jq have multiple elements")
+    return values[0]
+
+
+class _Compiled:
+    def __init__(self, program):
+        self.program = program
+
+    def all(self, value, vars=None):
+        return all(self.program, value, vars=vars)
+
+    def first(self, value, default=None, vars=None):
+        return first(self.program, value, default=default, vars=vars)
+
+    def one(self, value, vars=None):
+        return one(self.program, value, vars=vars)
+
+
+def compile(program):
+    return _Compiled(program)
+PY
       cat > /usr/local/bin/cloudmapper <<'EOF'
 #!/bin/sh
-exec /opt/cyberstrike-venv/bin/python /opt/cloudmapper/cloudmapper.py "$@"
+exec /opt/cyberstrike-cloudmapper-venv/bin/python /opt/cloudmapper/cloudmapper.py "$@"
 EOF
       chmod 0755 /usr/local/bin/cloudmapper
+      # Import every command once during the image build.  This catches a
+      # missing runtime dependency while the image is being built, instead of
+      # exposing a broken command through the MCP catalog.
+      cloudmapper_status=0
+      /opt/cyberstrike-cloudmapper-venv/bin/python /opt/cloudmapper/cloudmapper.py \
+        >/tmp/cloudmapper-help.txt 2>&1 || cloudmapper_status=$?
+      if [ "$cloudmapper_status" -ne 255 ]; then
+        cat /tmp/cloudmapper-help.txt >&2
+        exit 1
+      fi
     fi
     # Releases are checksummed by the upstream project and avoid a Go toolchain
     # dependency in the image.
